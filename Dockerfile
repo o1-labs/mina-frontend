@@ -51,11 +51,11 @@
 #RUN cat nginx.conf
 
 
-FROM node:18 AS BUILD_IMAGE
+FROM node:22 AS BUILD_IMAGE
 WORKDIR /app
 COPY . .
 RUN npm install
-RUN node_modules/.bin/ng build --configuration production
+RUN node_modules/.bin/ng build --configuration uptime
 RUN npm prune --production
 FROM nginx:alpine
 RUN pwd
