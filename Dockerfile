@@ -1,4 +1,4 @@
-FROM node:22 AS build_image
+FROM node:22-alpine AS build_image
 WORKDIR /app
 
 # Define build arguments for environment variables
@@ -11,7 +11,7 @@ RUN npm install
 # Pass build arguments to the environment and run the build command
 ENV FETCHER_HOST=$FETCHER_HOST
 ENV FETCHER_PORT=$FETCHER_PORT
-RUN node_modules/.bin/ng build --configuration fetcher && npm prune --production
+RUN node --max-old-space-size=4096 node_modules/.bin/ng build --configuration fetcher && npm prune --production
 
 FROM nginx:alpine
 WORKDIR /usr/share/nginx/html
