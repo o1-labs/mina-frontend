@@ -65,7 +65,7 @@
             "aot": true
           },
           "configurations": {
-            "uptime": {
+            "fetcher": {
               "budgets": [
                 {
                   "type": "initial",
@@ -81,7 +81,7 @@
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.uptime.ts"
+                  "with": "src/environments/environment.fetcher.ts"
                 }
               ],
               "outputHashing": "all"
@@ -274,8 +274,8 @@
             "development": {
               "browserTarget": "mina-frontend:build:development"
             },
-            "uptime": {
-              "browserTarget": "mina-frontend:build:uptime"
+            "fetcher": {
+              "browserTarget": "mina-frontend:build:fetcher"
             }
           },
           "options": {
