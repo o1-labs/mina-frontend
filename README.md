@@ -251,5 +251,5 @@ npm run tests
 To build the Docker image, you need to run the following command:
 
 ```bash
-docker build --build-arg FETCHER_HOST=localhost --build-arg FETCHER_PORT=4000 -t mina-frontend .
+docker build --build-arg FETCHER_HOST="http://localhost" --build-arg FETCHER_PORT="4000" -t mina-frontend .
 ```
