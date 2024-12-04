@@ -5,8 +5,8 @@ export const environment: Readonly<MinaEnv> = {
   identifier: 'fetcher',
   // aggregator: 'http://1.k8.openmina.com:31308/aggregator',
   nodeLister: {
-    domain: process.env['FETCHER_HOST'] ?? 'localhost',
-    port: Number(process.env['FETCHER_PORT'] ?? 4000),
+    domain: FETCHER_HOST_TO_BE_REPLACED,
+    port: FETCHER_PORT_TO_BE_REPLACED,
   },
   isVanilla: false,
   globalConfig: {
