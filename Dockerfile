@@ -1,4 +1,4 @@
-FROM node:22 AS BUILD_IMAGE
+FROM node:22 AS build_image
 WORKDIR /app
 
 # Define build arguments for environment variables
@@ -17,5 +17,5 @@ FROM nginx:alpine
 WORKDIR /usr/share/nginx/html
 
 # Copy built files and nginx configuration
-COPY --from=BUILD_IMAGE /app/dist/mina-frontend /usr/share/nginx/html
-COPY --from=BUILD_IMAGE /app/nginx.conf /etc/nginx/nginx.conf
+COPY --from=build_image /app/dist/mina-frontend /usr/share/nginx/html
+COPY --from=build_image /app/nginx.conf /etc/nginx/nginx.conf
