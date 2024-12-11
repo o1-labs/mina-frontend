@@ -2,6 +2,7 @@ FROM node:22-alpine AS build_image
 WORKDIR /app
 ARG FETCHER_HOST=localhost
 ARG FETCHER_PORT=4000
+ARG APP_CONFIG=production
 ENV FETCHER_HOST=${FETCHER_HOST}
 ENV FETCHER_PORT=${FETCHER_PORT}
 COPY . .
@@ -9,7 +10,7 @@ RUN apk add --no-cache gettext \
   && cp src/environments/environment.fetcher.ts src/environments/environment.fetcher.ts.template \
   && envsubst < src/environments/environment.fetcher.ts.template > src/environments/environment.fetcher.ts \
   && npm install \
-  && node --max-old-space-size=4096 node_modules/.bin/ng build --configuration fetcher \
+  && node --max-old-space-size=4096 node_modules/.bin/ng build --configuration ${APP_CONFIG} \
   && npm prune --production
 
 FROM nginx:alpine
