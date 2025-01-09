@@ -5,8 +5,8 @@ export const environment: Readonly<MinaEnv> = {
   identifier: 'fetcher',
   // aggregator: 'http://1.k8.openmina.com:31308/aggregator',
   nodeLister: {
-    domain: '${FETCHER_HOST}', // To be replaced during the Docker image build procedure
-    port: Number('${FETCHER_PORT}'), // To be replaced during the Docker image build procedure
+    domain: FETCHER_HOST, // Will be replaced by Webpack DefinePlugin
+    port: Number(FETCHER_PORT), // Will be replaced by Webpack DefinePlugin
   },
   isVanilla: false,
   globalConfig: {
