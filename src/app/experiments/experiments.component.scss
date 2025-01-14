@@ -5,3 +5,30 @@
 .error-container {
   margin: 3px
 }
+
+.refresh-button {
+  margin: 3px
+}
+
+.icon-display {
+  transform: scale(0.8);
+}
+
+.icon-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+table {
+  width: 100%;
+}
+
+td {
+  vertical-align: middle;
+}
+
+.table-container {
+  height: 95vh;
+  overflow: auto;
+}
