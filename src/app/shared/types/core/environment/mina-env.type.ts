@@ -14,7 +14,7 @@ export interface MinaEnv {
   firebase?: FirebaseOptions;
   globalConfig?: {
     features?: FeaturesConfig;
-  }
+  };
 }
 
 export interface MinaNode {
@@ -41,7 +41,7 @@ export type FeatureType =
   | 'logs'
   | 'storage'
   | 'snark-worker'
-  ;
+  | 'experiments';
 
 interface SentryConfig {
   dsn: string;

@@ -258,5 +258,5 @@ Alternatively, you can pass the build arguments to the corresponding command,
 in case if you need to build the Docker image for a specific environment configuration:
 
 ```bash
-docker build --build-arg FETCHER_HOST="http://localhost" --build-arg FETCHER_PORT="4000" --build-arg APP_CONFIG="fetcher" -t mina-frontend .
+docker build --build-arg FETCHER_HOST="http://localhost" --build-arg FETCHER_PORT="4000" --build-arg APP_CONFIG="fetcher" --build-arg EXPERIMENTS_BACKEND_API_ENDPOINT=http://localhost:3003/api/experiments -t mina-frontend .
 ```

@@ -1,0 +1,46 @@
+<div *ngIf="isLoading" class="loading-container">
+  <mat-spinner [diameter]="16"></mat-spinner>
+</div>
+
+<div *ngIf="!isLoading && experiments.length === 0" class="error-container">
+  <p>No experiments available.</p>
+</div>
+
+<div *ngIf="!isLoading && experiments.length > 0">
+  <table *ngIf="!isLoading">
+    <thead>
+      <tr>
+        <th>exp</th>
+        <th>round</th>
+        <th>rate_min</th>
+        <th>zkapp_rate_min</th>
+        <th>payment_rate_min</th>
+        <th>duration</th>
+        <th>max_latency</th>
+        <th>missed</th>
+        <th>failed</th>
+        <th>successful</th>
+        <th>start</th>
+        <th>total</th>
+        <th>zkapps</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let experiment of experiments">
+        <td>{{ experiment.exp }}</td>
+        <td>{{ experiment.round }}</td>
+        <td>{{ experiment.rate_min }}</td>
+        <td>{{ experiment.zkapp_rate_min }}</td>
+        <td>{{ experiment.payment_rate_min }}</td>
+        <td>{{ experiment.duration }}</td>
+        <td>{{ experiment.max_latency }}</td>
+        <td>{{ experiment.missed }}</td>
+        <td>{{ experiment.failed }}</td>
+        <td>{{ experiment.successful }}</td>
+        <td>{{ experiment.start }}</td>
+        <td>{{ experiment.total }}</td>
+        <td>{{ experiment.zkapps }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
