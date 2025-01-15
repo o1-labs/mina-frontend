@@ -45,3 +45,10 @@
 .bold-text {
   font-weight: bold;
 }
+
+@media (min-width: 701px) {
+  .desktop-container {
+    overflow: scroll;
+    padding-bottom: 30px;
+  }
+}

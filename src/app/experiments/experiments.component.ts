@@ -75,7 +75,7 @@ export class ExperimentsComponent
     this.table.gridTemplateColumns = [
       250, 150, 150, 200, 150, 150, 200, 150, 150, 150, 300, 150, 150,
     ];
-    this.table.minWidth = 2450;
+    this.table.minWidth = 2300;
     this.table.sortClz = class {
       constructor(public payload: TableSort<Experiment>) {
         this.type = 'SORT';
