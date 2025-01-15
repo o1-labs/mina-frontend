@@ -1,13 +1,29 @@
+@import 'variables';
+
+@media (min-width: 701px) {
+	:host ::ng-deep .row {
+		&.head {
+			overflow-x: hidden;
+			overflow-y: scroll;
+			padding-right: 0 !important;
+		}
+
+		span:nth-child(4) {
+			min-width: 220px;
+		}
+	}
+}
+
 .loading-container {
-  margin: 3px
+  margin: 10px
 }
 
 .error-container {
-  margin: 3px
+  margin: 10px
 }
 
 .refresh-button {
-  margin: 3px
+  margin: 10px
 }
 
 .icon-display {
@@ -20,15 +36,26 @@
   width: 100%;
 }
 
-table {
-  width: 100%;
+.successful {
+	color: $success-secondary;
 }
 
-td {
-  vertical-align: middle;
+.missed {
+	color: $aware-secondary;
 }
 
-.table-container {
-  height: 95vh;
-  overflow: auto;
+.failed {
+	color: $warn-primary;
+}
+
+.text-align-left {
+  text-align: left;
+}
+
+.text-align-right {
+  text-align: right;
+}
+
+.bold-text {
+  font-weight: bold;
 }
