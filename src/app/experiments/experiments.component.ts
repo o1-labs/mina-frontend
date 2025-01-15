@@ -73,21 +73,9 @@ export class ExperimentsComponent
 
   protected override setupTable(): void {
     this.table.gridTemplateColumns = [
-      250,
-      150,
-      150,
-      200,
-      150,
-      150,
-      200,
-      150,
-      150,
-      150,
-      'auto',
-      150,
-      150,
+      250, 150, 150, 200, 150, 150, 200, 150, 150, 150, 300, 150, 150,
     ];
-    this.table.minWidth = 998;
+    this.table.minWidth = 2450;
     this.table.sortClz = class {
       constructor(public payload: TableSort<Experiment>) {
         this.type = 'SORT';
