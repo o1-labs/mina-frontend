@@ -65,9 +65,24 @@
       {{ row.max_latency.milliseconds | number : "1.0-3" }}ms
     </ng-container>
   </span>
-  <span class="missed">{{ row.missed }}</span>
-  <span class="failed">{{ row.failed }}</span>
-  <span class="successful">{{ row.successful }}</span>
+  <span
+    class="missed"
+    [ngClass]="{ 'bold-text': shouldMakeBoldStatusRate(i, 'missed') }"
+  >
+    {{ row.missed }}
+  </span>
+  <span
+    class="failed"
+    [ngClass]="{ 'bold-text': shouldMakeBoldStatusRate(i, 'failed') }"
+  >
+    {{ row.failed }}
+  </span>
+  <span
+    class="successful"
+    [ngClass]="{ 'bold-text': shouldMakeBoldStatusRate(i, 'successful') }"
+  >
+    {{ row.successful }}
+  </span>
   <span>{{ row.start | date : "long" }}</span>
   <span class="secondary">{{ row.total }}</span>
   <span class="secondary">{{ row.zkapps }}</span>

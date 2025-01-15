@@ -73,7 +73,19 @@ export class ExperimentsComponent
 
   protected override setupTable(): void {
     this.table.gridTemplateColumns = [
-      250, 150, 150, 200, 150, 150, 150, 150, 150, 150, 300, 150, 150,
+      250,
+      150,
+      150,
+      200,
+      150,
+      150,
+      200,
+      150,
+      150,
+      150,
+      'auto',
+      150,
+      150,
     ];
     this.table.minWidth = 998;
     this.table.sortClz = class {
@@ -118,6 +130,13 @@ export class ExperimentsComponent
       return true;
     }
     return this.experiments[index].exp !== this.experiments[index - 1].exp;
+  }
+
+  shouldMakeBoldStatusRate(
+    index: number,
+    statusName: 'missed' | 'failed' | 'successful'
+  ): boolean {
+    return this.experiments[index][statusName] !== '0.00';
   }
 
   getRowSpan(index: number): number {
