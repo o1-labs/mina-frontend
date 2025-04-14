@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
-import { TracingOverviewClose, TracingOverviewGetCheckpoints } from '@tracing/tracing-overview/tracing-overview.actions';
+import { TracingOverviewClose, TracingOverviewGetCheckpoints, TracingOverviewGetDeployments } from '@tracing/tracing-overview/tracing-overview.actions';
 import { TracingOverviewCheckpoint } from '@shared/types/tracing/overview/tracing-overview-checkpoint.type';
 import { selectActiveNode } from '@app/app.state';
 import { filter } from 'rxjs';
@@ -18,6 +18,7 @@ export class TracingOverviewComponent extends StoreDispatcher implements OnInit,
 
   ngOnInit(): void {
     this.listenToActiveNodeChange();
+    this.dispatch(TracingOverviewGetDeployments);
   }
 
   private listenToActiveNodeChange(): void {

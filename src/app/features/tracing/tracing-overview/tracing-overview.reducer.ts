@@ -4,15 +4,22 @@ import {
   TRACING_OVERVIEW_GET_CHECKPOINTS_SUCCESS,
   TRACING_OVERVIEW_SORT,
   TRACING_OVERVIEW_TOGGLE_CONDENSED_VIEW,
+  TRACING_OVERVIEW_FILTER,
   TracingOverviewActions,
+  TRACING_OVERVIEW_GET_DEPLOYMENTS_SUCCESS,
+  TRACING_OVERVIEW_GET_CHECKPOINTS,
 } from '@tracing/tracing-overview/tracing-overview.actions';
 import { SortDirection } from '@shared/types/shared/table-sort.type';
 import { TracingOverviewCheckpoint } from '@shared/types/tracing/overview/tracing-overview-checkpoint.type';
 
 const initialState: TracingOverviewState = {
   checkpoints: [],
+  deployments: [],
   sortDirection: SortDirection.DSC,
   condensedView: JSON.parse(localStorage.getItem('condensed_tracing')) || false,
+  filter: {
+    deployment: undefined,
+  },
 };
 
 export function reducer(state: TracingOverviewState = initialState, action: TracingOverviewActions): TracingOverviewState {
@@ -25,6 +32,23 @@ export function reducer(state: TracingOverviewState = initialState, action: Trac
       };
     }
 
+    case TRACING_OVERVIEW_GET_DEPLOYMENTS_SUCCESS: {
+      return {
+        ...state,
+        deployments: action.payload,
+      };
+    }
+
+    case TRACING_OVERVIEW_GET_CHECKPOINTS: {
+      return {
+        ...state,
+        filter: {
+          ...state.filter,
+          deployment: action.payload ? action.payload.deployment : undefined,
+        },
+      };
+    }
+    
     case TRACING_OVERVIEW_SORT: {
       return {
         ...state,
@@ -40,6 +64,13 @@ export function reducer(state: TracingOverviewState = initialState, action: Trac
       return {
         ...state,
         condensedView: !state.condensedView,
+      };
+    }
+
+    case TRACING_OVERVIEW_FILTER: {
+      return {
+        ...state,
+        filter: action.payload,
       };
     }
 
