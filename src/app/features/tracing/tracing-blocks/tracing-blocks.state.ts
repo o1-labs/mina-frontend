@@ -4,12 +4,16 @@ import { createSelector, MemoizedSelector } from '@ngrx/store';
 import { TracingTraceGroup } from '@shared/types/tracing/blocks/tracing-trace-group.type';
 import { selectTracingBlocksState } from '@tracing/tracing.state';
 import { TableSort } from '@shared/types/shared/table-sort.type';
+import { TracingBlockFilter } from '@app/shared/types/tracing/blocks/tracing-block-filter.type';
+import { TracingBlocksFilter } from './tracing-blocks.actions';
 
 export interface TracingBlocksState {
   traces: TracingBlockTrace[];
+  deployments: number[];
   activeTrace: TracingBlockTrace;
   activeTraceGroups: TracingTraceGroup[];
   sort: TableSort<TracingBlockTrace>;
+  filter: TracingBlockFilter;
 }
 
 const select = <T>(selector: (state: TracingBlocksState) => T): MemoizedSelector<MinaState, T> => createSelector(
@@ -25,3 +29,5 @@ export const selectTracingActiveTraceDetails = select((state: TracingBlocksState
 }));
 export const selectTracingActiveTraceGroups = select((state: TracingBlocksState): TracingTraceGroup[] => state.activeTraceGroups);
 export const selectTracingBlocksSorting = select((state: TracingBlocksState): TableSort<TracingBlockTrace> => state.sort);
+export const selectTracingBlocksFilter = select((state: TracingBlocksState): TracingBlockFilter => state.filter);
+export const selectTracingBlocksDeployments = select((state: TracingBlocksState): number[] => state.deployments);
