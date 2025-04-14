@@ -31,7 +31,6 @@ export class TracingOverviewGraphListComponent extends StoreDispatcher implement
 
   private listenToCheckpointChanges(): void {
     this.select(selectTracingOverviewCheckpoints, (checkpoints: TracingOverviewCheckpoint[]) => {
-      console.log('checkpoints', checkpoints);
       this.checkpoints = checkpoints;
       this.detect();
     });

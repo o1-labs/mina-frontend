@@ -22,11 +22,6 @@ export class TracingOverviewService {
       ? `{ blockTracesDistribution(deploymentId: ${deployment}) }` 
       : '{ blockTracesDistribution }';
 
-    this.tracingGQL.query<any>('blockTracesDistribution', '{ blockTracesDistribution(deployment: 1111) }').subscribe(response => {
-      console.log('Observable content:', response);
-    });
-
-    console.log('Query:', query);
     return this.tracingGQL.query<any>('blockTracesDistribution', query).pipe(
       map(response => 
         this.mapStatisticsResponse(response.blockTracesDistribution)),
