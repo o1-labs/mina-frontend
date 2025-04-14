@@ -11,9 +11,25 @@ export class TracingOverviewService {
 
   constructor(private tracingGQL: TracingGraphQlService) { }
 
-  getStatistics(): Observable<TracingOverviewCheckpoint[]> {
-    return this.tracingGQL.query<any>('blockTracesDistribution', '{ blockTracesDistribution }').pipe(
-      map(response => this.mapStatisticsResponse(response.blockTracesDistribution)),
+  getDeployments(): Observable<number[]> {
+    return this.tracingGQL.query<any>('deployments', '{ deployments }').pipe(
+      map(response => response.deployments.map((d: any) => d)),
+    );
+  }
+
+   getStatistics(deployment?: number): Observable<TracingOverviewCheckpoint[]> {
+    const query = deployment !== undefined 
+      ? `{ blockTracesDistribution(deploymentId: ${deployment}) }` 
+      : '{ blockTracesDistribution }';
+
+    this.tracingGQL.query<any>('blockTracesDistribution', '{ blockTracesDistribution(deployment: 1111) }').subscribe(response => {
+      console.log('Observable content:', response);
+    });
+
+    console.log('Query:', query);
+    return this.tracingGQL.query<any>('blockTracesDistribution', query).pipe(
+      map(response => 
+        this.mapStatisticsResponse(response.blockTracesDistribution)),
     );
   }
 
