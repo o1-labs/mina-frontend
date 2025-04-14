@@ -45,7 +45,7 @@ export class TracingBlocksEffects extends MinaBaseEffect<TracingBlocksActions> {
         switchMap(({ action }) =>
           action.type === TRACING_BLOCKS_CLOSE
             ? EMPTY
-            : this.tracingBlocksService.getTraces()
+            : this.tracingBlocksService.getTraces( action.payload ? action.payload.deployment : undefined)
         ),
         map((payload: TracingBlockTrace[]) => ({
           type: TRACING_BLOCKS_GET_TRACES_SUCCESS,

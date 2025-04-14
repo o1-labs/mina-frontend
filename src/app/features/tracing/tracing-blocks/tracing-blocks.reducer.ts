@@ -1,6 +1,8 @@
 import { TracingBlocksState } from '@tracing/tracing-blocks/tracing-blocks.state';
 import {
   TRACING_BLOCKS_CLOSE,
+  TRACING_BLOCKS_FILTER,
+  TRACING_BLOCKS_GET_DEPLOYMENTS_SUCCESS,
   TRACING_BLOCKS_GET_DETAILS_SUCCESS, TRACING_BLOCKS_GET_TRACES,
   TRACING_BLOCKS_GET_TRACES_SUCCESS,
   TRACING_BLOCKS_SELECT_ROW,
@@ -10,6 +12,7 @@ import {
 import { TracingBlockTrace } from '@shared/types/tracing/blocks/tracing-block-trace.type';
 import { SortDirection, TableSort } from '@shared/types/shared/table-sort.type';
 import { sort } from '@shared/helpers/array.helper';
+import { TRACING_OVERVIEW_GET_DEPLOYMENTS_SUCCESS } from '../tracing-overview/tracing-overview.actions';
 
 const initialState: TracingBlocksState = {
   traces: undefined,
@@ -19,6 +22,10 @@ const initialState: TracingBlocksState = {
     sortBy: 'height',
     sortDirection: SortDirection.DSC,
   },
+  deployments: [],
+  filter: {
+    deployment: undefined,
+  }
 };
 
 export function reducer(state: TracingBlocksState = initialState, action: TracingBlocksActions): TracingBlocksState {
@@ -45,6 +52,13 @@ export function reducer(state: TracingBlocksState = initialState, action: Tracin
       };
     }
 
+    case TRACING_BLOCKS_GET_DEPLOYMENTS_SUCCESS: {
+      return {
+        ...state,
+        deployments: action.payload,
+      };
+    }
+
     case TRACING_BLOCKS_SELECT_ROW: {
       return {
         ...state,
@@ -57,6 +71,13 @@ export function reducer(state: TracingBlocksState = initialState, action: Tracin
         ...state,
         traces: sortTraces(state.traces, action.payload),
         sort: { ...action.payload },
+      };
+    }
+
+    case TRACING_BLOCKS_FILTER: {
+      return {
+        ...state,
+        filter: action.payload,
       };
     }
 

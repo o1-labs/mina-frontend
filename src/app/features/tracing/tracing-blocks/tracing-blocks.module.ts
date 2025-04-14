@@ -10,6 +10,9 @@ import { TracingBlocksSidePanelComponent } from '@tracing/tracing-blocks/tracing
 import { MinaJsonViewerComponent } from '@shared/components/mina-json-viewer/mina-json-viewer.component';
 import { CopyComponent } from '@shared/components/copy/copy.component';
 import { HorizontalResizableContainerComponent } from '@shared/components/horizontal-resizable-container/horizontal-resizable-container.component';
+import { TracingBlocksFilter } from './tracing-blocks.actions';
+import { TracingBlocksFiltersComponent } from './tracing-blocks-filters/tracing-blocks-filters.component';
+import { HorizontalMenuComponent } from '@app/shared/components/horizontal-menu/horizontal-menu.component';
 
 
 @NgModule({
@@ -17,6 +20,7 @@ import { HorizontalResizableContainerComponent } from '@shared/components/horizo
     TracingBlocksComponent,
     TracingBlocksTableComponent,
     TracingBlocksSidePanelComponent,
+    TracingBlocksFiltersComponent
   ],
   imports: [
     SharedModule,
@@ -25,6 +29,7 @@ import { HorizontalResizableContainerComponent } from '@shared/components/horizo
     EffectsModule.forFeature([TracingBlocksEffects]),
     TracingBlocksRouting,
     HorizontalResizableContainerComponent,
+    HorizontalMenuComponent
   ],
 })
 export class TracingBlocksModule {}

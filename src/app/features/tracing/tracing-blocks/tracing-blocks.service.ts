@@ -14,8 +14,12 @@ export class TracingBlocksService {
 
   constructor(private tracingGQL: TracingGraphQlService) { }
 
-  getTraces(): Observable<TracingBlockTrace[]> {
-    return this.tracingGQL.query<any>('getTraces', `{ blockTraces }`)
+  getTraces(deployment?: number): Observable<TracingBlockTrace[]> {
+    const query = deployment !== undefined 
+    ? `{ blockTraces(deployment_id: ${deployment}) }`
+    : '{ blockTraces }';
+
+    return this.tracingGQL.query<any>('getTraces', query)
       .pipe(
         map((response: any) =>
           response.blockTraces.traces.reverse().map((trace: any) => ({
