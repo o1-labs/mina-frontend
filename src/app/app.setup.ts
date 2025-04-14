@@ -51,6 +51,9 @@ import { DswState } from '@dsw/dsw.state';
 import * as fromLoading from '@app/layout/toolbar/loading.reducer';
 import { LoadingState } from '@app/layout/toolbar/loading.reducer';
 
+import * as fromExperiments from '@experiments/experiments.reducer';
+import { ExperimentsState } from '@experiments/experiments.state';
+
 
 export interface MinaState {
   app: AppState;
@@ -66,6 +69,7 @@ export interface MinaState {
   storage: StorageState;
   dsw: DswState;
   loading: LoadingState;
+  experiments: ExperimentsState;
 }
 
 type MinaAction =
@@ -97,6 +101,7 @@ export const reducers: ActionReducerMap<MinaState, MinaAction> = {
   storage: fromStorage.reducer,
   dsw: fromDsw.reducer,
   loading: fromLoading.reducer,
+  experiments: fromExperiments.reducer,
 };
 
 export const metaReducers: MetaReducer<MinaState, MinaAction>[] = [];

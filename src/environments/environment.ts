@@ -20,6 +20,7 @@ export const environment: Readonly<MinaEnv> = {
       storage: ['accounts'],
       'snark-worker': ['dashboard', 'actions'],
       'web-node': ['wallet', 'peers', 'logs', 'state'],
+      experiments: [],
     },
   },
   configs: [

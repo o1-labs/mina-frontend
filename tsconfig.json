@@ -46,6 +46,9 @@
       "@environment/*": [
         "src/environments/*"
       ],
+      "@experiments/*": [
+        "src/app/experiments/*"
+      ],
       "@resources/*": [
         "src/app/features/resources/*"
       ],
