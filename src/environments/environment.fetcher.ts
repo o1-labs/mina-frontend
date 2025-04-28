@@ -11,21 +11,7 @@ export const environment: Readonly<MinaEnv> = {
   isVanilla: false,
   globalConfig: {
     features: {
-      dashboard: ['nodes', 'topology'],
-      explorer: [
-        'blocks',
-        'transactions',
-        'snark-pool',
-        'scan-state',
-        'snark-traces',
-      ],
-      resources: ['system'],
-      network: ['messages', 'connections', 'blocks', 'blocks-ipc'],
       tracing: ['overview', 'blocks'],
-      benchmarks: ['wallets', 'transactions'],
-      storage: ['accounts'],
-      'snark-worker': ['dashboard', 'actions'],
-      'web-node': ['wallet', 'peers', 'logs', 'state'],
       experiments: [],
     },
   },
