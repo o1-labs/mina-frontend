@@ -8,6 +8,7 @@ import { TracingOverviewCheckpointFilter } from '@app/shared/types/tracing/overv
 export interface TracingOverviewState {
   checkpoints: TracingOverviewCheckpoint[];
   deployments: number[];
+  nodes: TracingOverviewCheckpointFilter[];
   sortDirection: SortDirection;
   condensedView: boolean;
   filter: TracingOverviewCheckpointFilter;
@@ -22,3 +23,4 @@ export const selectTracingOverviewSortDirection = select((state: TracingOverview
 export const selectTracingOverviewCondensedView = select((state: TracingOverviewState): boolean => state.condensedView);
 export const selectTracingOverviewCheckpointsFilter = select((state: TracingOverviewState): TracingOverviewCheckpointFilter => state.filter);
 export const selectTracingOverviewDeployments = select((state: TracingOverviewState): number[] => state.deployments);
+export const selectTracingOverviewNodes = select((state: TracingOverviewState): TracingOverviewCheckpointFilter[] => state.nodes);
