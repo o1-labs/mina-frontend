@@ -3,23 +3,18 @@ import { MinaEnv } from '@shared/types/core/environment/mina-env.type';
 export const environment: Readonly<MinaEnv> = {
   production: false,
   identifier: 'local',
-  aggregator: 'http://1.k8.openmina.com:31308/aggregator',
   nodeLister: {
-    domain: 'http://65.21.195.80',
+    domain: 'http://65.21.209.217',
     port: 4000,
   },
+  tracingEndpoint: {
+    domain: 'http://65.21.209.217',
+    port: 9080,
+  },  
   isVanilla: true,
   globalConfig: {
     features: {
-      dashboard: ['nodes', 'topology'],
-      explorer: ['blocks', 'transactions', 'snark-pool', 'scan-state', 'snark-traces'],
-      resources: ['system'],
-      network: ['messages', 'connections', 'blocks', 'blocks-ipc'],
       tracing: ['overview', 'blocks'],
-      benchmarks: ['wallets', 'transactions'],
-      storage: ['accounts'],
-      'snark-worker': ['dashboard', 'actions'],
-      'web-node': ['wallet', 'peers', 'logs', 'state'],
       experiments: [],
     },
   },

@@ -3,7 +3,7 @@ import {
   TRACING_BLOCKS_CLOSE,
   TRACING_BLOCKS_FILTER,
   TRACING_BLOCKS_GET_DEPLOYMENTS_SUCCESS,
-  TRACING_BLOCKS_GET_DETAILS_SUCCESS, TRACING_BLOCKS_GET_TRACES,
+  TRACING_BLOCKS_GET_DETAILS_SUCCESS, TRACING_BLOCKS_GET_NODES_SUCCESS, TRACING_BLOCKS_GET_TRACES,
   TRACING_BLOCKS_GET_TRACES_SUCCESS,
   TRACING_BLOCKS_SELECT_ROW,
   TRACING_BLOCKS_SORT,
@@ -18,6 +18,7 @@ const initialState: TracingBlocksState = {
   traces: undefined,
   activeTrace: undefined,
   activeTraceGroups: [],
+  nodes: [],
   sort: {
     sortBy: 'height',
     sortDirection: SortDirection.DSC,
@@ -25,6 +26,7 @@ const initialState: TracingBlocksState = {
   deployments: [],
   filter: {
     deployment: undefined,
+    name: undefined,
   }
 };
 
@@ -59,10 +61,21 @@ export function reducer(state: TracingBlocksState = initialState, action: Tracin
       };
     }
 
+    case TRACING_BLOCKS_GET_NODES_SUCCESS: {
+      return {
+        ...state,
+        nodes: action.payload,
+        filter: {
+          ...state.filter,
+          name: state.filter.name && !action.payload.some(node => node.name === state.filter.name) ? undefined : state.filter.name,
+        },
+      };
+    }
+
     case TRACING_BLOCKS_SELECT_ROW: {
       return {
         ...state,
-        activeTrace: action.payload,
+        activeTrace: action.payload.trace,
       };
     }
 

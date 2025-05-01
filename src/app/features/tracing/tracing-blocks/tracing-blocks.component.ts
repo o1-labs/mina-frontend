@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, ElementRef, OnDestroy, OnInit } from '@angular/core';
 import { TracingBlockTrace } from '@shared/types/tracing/blocks/tracing-block-trace.type';
-import { TracingBlocksClose, TracingBlocksGetTraces } from '@tracing/tracing-blocks/tracing-blocks.actions';
+import { TracingBlocksClose, TracingBlocksGetDeployments, TracingBlocksGetTraces } from '@tracing/tracing-blocks/tracing-blocks.actions';
 import { selectTracingActiveTrace } from '@tracing/tracing-blocks/tracing-blocks.state';
 import { selectActiveNode } from '@app/app.state';
 import { filter } from 'rxjs';
@@ -20,6 +20,7 @@ export class TracingBlocksComponent extends StoreDispatcher implements OnInit, O
   constructor(public el: ElementRef<HTMLElement>) { super(); }
 
   ngOnInit(): void {
+    this.dispatch(TracingBlocksGetDeployments);
     this.listenToActiveNodeChange();
     this.listenToActiveRowChange();
   }

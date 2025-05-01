@@ -7,8 +7,8 @@ import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { TemplatePortal } from '@angular/cdk/portal';
-import { TRACING_BLOCKS_FILTER, TRACING_BLOCKS_GET_TRACES, TracingBlocksFilter } from '../tracing-blocks.actions';
-import { selectTracingBlocksDeployments, selectTracingBlocksFilter } from '../tracing-blocks.state';
+import { TRACING_BLOCKS_FILTER, TRACING_BLOCKS_GET_NODES, TRACING_BLOCKS_GET_TRACES, TracingBlocksFilter } from '../tracing-blocks.actions';
+import { selectTracingBlocksDeployments, selectTracingBlocksFilter, selectTracingBlocksNodes } from '../tracing-blocks.state';
 import { TracingBlockFilter } from '@app/shared/types/tracing/blocks/tracing-block-filter.type';
 
 @UntilDestroy()
@@ -23,21 +23,33 @@ import { TracingBlockFilter } from '@app/shared/types/tracing/blocks/tracing-blo
 export class TracingBlocksFiltersComponent extends ManualDetection implements OnInit {
 
   deployments: number[];
+  nodes: TracingBlockFilter[];
   filter: TracingBlockFilter;
 
   @ViewChild('deploymentDropdown') private deploymentDrTemplate: TemplateRef<void>;
   @ViewChild('deploymentDropdownTrigger') private deploymentDropdownTrigger: ElementRef<HTMLDivElement>;
   private deploymentSelectorOverlay: OverlayRef;
 
+  @ViewChild('nodesDropdown') private nodesDrTemplate: TemplateRef<void>;
+  @ViewChild('nodesDropdownTrigger') private nodesDropdownTrigger: ElementRef<HTMLDivElement>;
+  private nodesSelectorOverlay: OverlayRef;
+
+
   constructor(private router: Router,
               private datePipe: DatePipe,
               private overlay: Overlay,
               private store: Store<MinaState>,
-              private viewContainerRef: ViewContainerRef) { super(); }
+              private viewContainerRef: ViewContainerRef) { super();
+                this.filter = {
+                  deployment: undefined,
+                  name: undefined,
+               }
+              }
 
   ngOnInit(): void {
     this.listenToFiltersChanges();
     this.listenToDeploymentsChanges();
+    this.listenToNodesChanges();
   }
 
   private listenToFiltersChanges(): void {
@@ -58,10 +70,34 @@ export class TracingBlocksFiltersComponent extends ManualDetection implements On
       });
   }
 
+  private listenToNodesChanges(): void {
+    this.store.select(selectTracingBlocksNodes)
+      .pipe(untilDestroyed(this))
+      .subscribe(nodes => {
+        this.nodes = nodes;
+        this.detect();
+      });
+  }
+
+  maxDeploymentId(): number {
+    return Math.max(...this.deployments);
+  }
+
+
   detachDeploymentsSelector(): void {
     if (this.deploymentSelectorOverlay?.hasAttached()) {
       this.deploymentSelectorOverlay.detach();
     }
+  }
+
+  detachNodesSelector(): void {
+    if (this.nodesSelectorOverlay?.hasAttached()) {
+      this.nodesSelectorOverlay.detach();
+    }
+  }
+
+  openNodesDropdown(event: MouseEvent): void {
+    this.nodesSelectorOverlay = this.openDropdown(event, this.nodesDrTemplate, this.nodesDropdownTrigger, this.nodesSelectorOverlay)
   }
 
   openDeploymentDropdown(event: MouseEvent): void {
@@ -94,19 +130,27 @@ export class TracingBlocksFiltersComponent extends ManualDetection implements On
     return selectorOverlay;
   }
   
+
+
   resetDeploymentsFilter(): void {
+    const maxDeployment = Math.max(...this.deployments);
     this.store.dispatch({
       type: TRACING_BLOCKS_FILTER,
       payload: {
-        ...this.filter,
-        deployment: undefined,
+      ...this.filter,
+      deployment: maxDeployment,
       } as TracingBlockFilter,
+    });
+    this.nodes = [];
+    this.store.dispatch({
+      type: TRACING_BLOCKS_GET_NODES,
+      payload: maxDeployment,
     });
     this.deploymentSelectorOverlay.detach();
     this.store.dispatch({
       type: TRACING_BLOCKS_GET_TRACES,
       payload: {
-        deployment: undefined,
+        deployment: maxDeployment,
       },
     });
     this.deploymentSelectorOverlay.detach();
@@ -121,16 +165,41 @@ export class TracingBlocksFiltersComponent extends ManualDetection implements On
       } as TracingBlockFilter,
     });
     this.store.dispatch({
-      type: TRACING_BLOCKS_GET_TRACES,
-      payload: {
-        deployment: deploymentId,
-      },
+      type: TRACING_BLOCKS_GET_NODES,
+      payload: deploymentId,
     });
     this.deploymentSelectorOverlay.detach();
   }
 
-  getDeployments(): number[] {
-     return Array.from(new Set(this.deployments));
+  filterNodes(name: string): void {
+    this.store.dispatch({
+      type: TRACING_BLOCKS_FILTER,
+      payload: {
+        ...this.filter,
+        name: name,
+      } as TracingBlockFilter,
+    });
+    this.store.dispatch({
+      type: TRACING_BLOCKS_GET_TRACES,
+      payload: {
+        ...this.filter,
+        name: name,
+      } as TracingBlockFilter,
+    });
+    this.nodesSelectorOverlay.detach();
   }
 
+  maxDeployment(): number {
+    return Math.max(...this.deployments);
+  }
+
+  // Filter out the max deployment from the list of deployments
+  // to avoid showing it in the dropdown as we have special entry 'Current' for this
+  getDeployments(): number[] {
+    return Array.from(this.deployments).filter(deployment => deployment !== this.maxDeployment());
+  }
+
+  getNodes(): TracingBlockFilter[] {
+    return Array.from(new Set(this.nodes));
+  }
 }

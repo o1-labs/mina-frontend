@@ -7,20 +7,25 @@ import { MinaState, selectMinaState } from '@app/app.setup';
 import { TracingOverviewService } from '@tracing/tracing-overview/tracing-overview.service';
 import {
   TRACING_OVERVIEW_CLOSE,
+  TRACING_OVERVIEW_FILTER,
   TRACING_OVERVIEW_GET_CHECKPOINTS,
   TRACING_OVERVIEW_GET_CHECKPOINTS_SUCCESS,
   TRACING_OVERVIEW_GET_DEPLOYMENTS,
   TRACING_OVERVIEW_GET_DEPLOYMENTS_SUCCESS,
+  TRACING_OVERVIEW_GET_NODES,
+  TRACING_OVERVIEW_GET_NODES_SUCCESS,
   TracingOverviewActions,
   TracingOverviewClose,
+  TracingOverviewFilter,
   TracingOverviewGetCheckpoints,
   TracingOverviewGetDeployments,
+  TracingOverviewGetNodes,
 } from '@tracing/tracing-overview/tracing-overview.actions';
 import { EMPTY, map, switchMap } from 'rxjs';
 import { TracingOverviewCheckpoint } from '@shared/types/tracing/overview/tracing-overview-checkpoint.type';
 import { catchErrorAndRepeat } from '@shared/constants/store-functions';
 import { MinaErrorType } from '@shared/types/error-preview/mina-error-type.enum';
-import { TRACING_BLOCKS_GET_DETAILS_SUCCESS } from '../tracing-blocks/tracing-blocks.actions';
+import { TracingOverviewCheckpointFilter } from '@app/shared/types/tracing/overview/tracing-overview-checkpoint-filter.type';
 
 @Injectable({
   providedIn: 'root',
@@ -29,6 +34,7 @@ export class TracingOverviewEffects extends MinaBaseEffect<TracingOverviewAction
 
   readonly getCheckpoints$: Effect;
   readonly getDeployments$: Effect;
+  readonly getNodes$: Effect;
 
   constructor(private actions$: Actions,
               private tracingOverviewService: TracingOverviewService,
@@ -37,13 +43,14 @@ export class TracingOverviewEffects extends MinaBaseEffect<TracingOverviewAction
     super(store, selectMinaState);
 
     this.getCheckpoints$ = createEffect(() => this.actions$.pipe(
-      ofType(TRACING_OVERVIEW_GET_CHECKPOINTS, TRACING_OVERVIEW_CLOSE),
-      this.latestActionState<TracingOverviewGetCheckpoints | TracingOverviewClose>(),
+      ofType(TRACING_OVERVIEW_FILTER),
+      this.latestActionState<TracingOverviewFilter>(),
       switchMap(({ action }) =>
-      action.type === TRACING_OVERVIEW_CLOSE
-        ? EMPTY
-        : this.tracingOverviewService.getStatistics(
-          action.payload ? action.payload.deployment : undefined,
+        this.tracingOverviewService.getStatistics(
+          {
+            deployment: action.payload.deployment,
+            name: action.payload.name,
+          }
         ),
       ),
       map((payload: TracingOverviewCheckpoint[]) => ({ type: TRACING_OVERVIEW_GET_CHECKPOINTS_SUCCESS, payload })),
@@ -60,6 +67,14 @@ export class TracingOverviewEffects extends MinaBaseEffect<TracingOverviewAction
       ),
       map((payload: number[]) => ({ type: TRACING_OVERVIEW_GET_DEPLOYMENTS_SUCCESS, payload })),
       catchErrorAndRepeat(MinaErrorType.GRAPH_QL, TRACING_OVERVIEW_GET_DEPLOYMENTS_SUCCESS, []),
+    ));
+
+    this.getNodes$ = createEffect(() => this.actions$.pipe(
+      ofType(TRACING_OVERVIEW_GET_NODES),
+      this.latestActionState<TracingOverviewGetNodes>(),
+      switchMap(({ action }) => this.tracingOverviewService.getNodes(action.payload)),
+      map((payload: TracingOverviewCheckpointFilter[]) => ({ type: TRACING_OVERVIEW_GET_NODES_SUCCESS, payload })),
+      catchErrorAndRepeat(MinaErrorType.GRAPH_QL, TRACING_OVERVIEW_GET_NODES_SUCCESS, []),
     ));
   }
 }

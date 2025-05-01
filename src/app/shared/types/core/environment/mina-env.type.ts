@@ -10,6 +10,10 @@ export interface MinaEnv {
     domain: string;
     port: number;
   };
+  tracingEndpoint?: {
+    domain: string;
+    port: number;
+  };
   sentry?: SentryConfig;
   firebase?: FirebaseOptions;
   globalConfig?: {

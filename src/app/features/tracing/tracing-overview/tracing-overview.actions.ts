@@ -8,6 +8,8 @@ enum TracingOverviewActionTypes {
   TRACING_OVERVIEW_GET_CHECKPOINTS_SUCCESS = 'TRACING_OVERVIEW_GET_CHECKPOINTS_SUCCESS',
   TRACING_OVERVIEW_GET_DEPLOYMENTS = 'TRACING_OVERVIEW_GET_DEPLOYMENTS',
   TRACING_OVERVIEW_GET_DEPLOYMENTS_SUCCESS = 'TRACING_OVERVIEW_GET_DEPLOYMENTS_SUCCESS',
+  TRACING_OVERVIEW_GET_NODES = 'TRACING_OVERVIEW_GET_NODES',
+  TRACING_OVERVIEW_GET_NODES_SUCCESS = 'TRACING_OVERVIEW_GET_NODES_SUCCESS',
   TRACING_OVERVIEW_SORT = 'TRACING_OVERVIEW_SORT',
   TRACING_OVERVIEW_TOGGLE_CONDENSED_VIEW = 'TRACING_OVERVIEW_TOGGLE_CONDENSED_VIEW',
   TRACING_OVERVIEW_CLOSE = 'TRACING_OVERVIEW_CLOSE',
@@ -18,6 +20,8 @@ export const TRACING_OVERVIEW_GET_CHECKPOINTS = TracingOverviewActionTypes.TRACI
 export const TRACING_OVERVIEW_GET_CHECKPOINTS_SUCCESS = TracingOverviewActionTypes.TRACING_OVERVIEW_GET_CHECKPOINTS_SUCCESS;
 export const TRACING_OVERVIEW_GET_DEPLOYMENTS = TracingOverviewActionTypes.TRACING_OVERVIEW_GET_DEPLOYMENTS;
 export const TRACING_OVERVIEW_GET_DEPLOYMENTS_SUCCESS = TracingOverviewActionTypes.TRACING_OVERVIEW_GET_DEPLOYMENTS_SUCCESS;
+export const TRACING_OVERVIEW_GET_NODES = TracingOverviewActionTypes.TRACING_OVERVIEW_GET_NODES;
+export const TRACING_OVERVIEW_GET_NODES_SUCCESS = TracingOverviewActionTypes.TRACING_OVERVIEW_GET_NODES_SUCCESS;
 export const TRACING_OVERVIEW_SORT = TracingOverviewActionTypes.TRACING_OVERVIEW_SORT;
 export const TRACING_OVERVIEW_TOGGLE_CONDENSED_VIEW = TracingOverviewActionTypes.TRACING_OVERVIEW_TOGGLE_CONDENSED_VIEW;
 export const TRACING_OVERVIEW_CLOSE = TracingOverviewActionTypes.TRACING_OVERVIEW_CLOSE;
@@ -31,7 +35,7 @@ export interface TracingOverviewAction extends FeatureAction<TracingOverviewActi
 export class TracingOverviewGetCheckpoints implements TracingOverviewAction {
   readonly type = TRACING_OVERVIEW_GET_CHECKPOINTS;
   
-  constructor(public payload: { deployment: number }) {}
+  constructor(public payload: { deployment: number, name: string }) {}
 }
 
 export class TracingOverviewGetCheckpointsSuccess implements TracingOverviewAction {
@@ -68,6 +72,15 @@ export class TracingOverviewGetDeploymentsSuccess implements TracingOverviewActi
   constructor(public payload: number[]) {}
 }
 
+export class TracingOverviewGetNodes implements TracingOverviewAction {
+  readonly type = TRACING_OVERVIEW_GET_NODES;
+  constructor(public payload: number) {}
+}
+ export class TracingOverviewGetNodesSuccess implements TracingOverviewAction {
+  readonly type = TRACING_OVERVIEW_GET_NODES_SUCCESS;
+  constructor(public payload: TracingOverviewCheckpointFilter[]) {}
+}
+
 export type TracingOverviewActions =
   | TracingOverviewGetCheckpoints
   | TracingOverviewGetCheckpointsSuccess
@@ -77,4 +90,6 @@ export type TracingOverviewActions =
   | TracingOverviewFilter
   | TracingOverviewGetDeployments
   | TracingOverviewGetDeploymentsSuccess
+  | TracingOverviewGetNodes
+  | TracingOverviewGetNodesSuccess
   ;

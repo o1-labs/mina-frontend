@@ -3,6 +3,7 @@ import { map, Observable } from 'rxjs';
 import { TracingOverviewCheckpoint } from '@shared/types/tracing/overview/tracing-overview-checkpoint.type';
 import { TracingOverviewCheckpointColumn } from '@shared/types/tracing/overview/tracing-overview-checkpoint-column.type';
 import { TracingGraphQlService } from '@core/services/tracing-graph-ql.service';
+import { TracingOverviewCheckpointFilter } from '@app/shared/types/tracing/overview/tracing-overview-checkpoint-filter.type';
 
 @Injectable({
   providedIn: 'root',
@@ -17,10 +18,22 @@ export class TracingOverviewService {
     );
   }
 
-   getStatistics(deployment?: number): Observable<TracingOverviewCheckpoint[]> {
-    const query = deployment !== undefined 
-      ? `{ blockTracesDistribution(deploymentId: ${deployment}) }` 
-      : '{ blockTracesDistribution }';
+  getNodes(deploymentId: number): Observable<TracingOverviewCheckpointFilter[]> {
+    let query = `{ nodes(deployment_id: ${deploymentId}) }`
+    return this.tracingGQL.query<any>('nodes', query).pipe(
+      map(response => response.nodes.map((n: any) => n)),
+    );
+  }
+
+   getStatistics(filter: TracingOverviewCheckpointFilter): Observable<TracingOverviewCheckpoint[]> {
+    if (!filter) {
+      return new Observable<TracingOverviewCheckpoint[]>(subscriber => {
+        subscriber.next([]);
+        subscriber.complete();
+      });
+    }
+    
+    const query = `{ blockTracesDistribution(deploymentId: ${filter.deployment}, node_name: "${filter.name}") }`;
 
     return this.tracingGQL.query<any>('blockTracesDistribution', query).pipe(
       map(response => 

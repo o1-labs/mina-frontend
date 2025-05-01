@@ -80,7 +80,7 @@ export class TracingBlocksTableComponent extends MinaTableWrapper<TracingBlockTr
   protected override onRowClick(trace: TracingBlockTrace): void {
     if (this.activeTrace?.hash !== trace.hash) {
       this.router.navigate([Routes.TRACING, Routes.BLOCKS, trace.hash], { queryParamsHandling: 'merge' });
-      this.dispatch(TracingBlocksSelectRow, trace);
+      this.dispatch(TracingBlocksSelectRow, { trace, filter: this.filter });
     }
   }
 
@@ -99,7 +99,10 @@ export class TracingBlocksTableComponent extends MinaTableWrapper<TracingBlockTr
       this.table.rows = traces;
       this.table.detect();
       if (this.preselect) {
-        this.dispatch(TracingBlocksSelectRow, this.traces.find(t => t.hash === this.hashFromRoute));
+        this.dispatch(TracingBlocksSelectRow, {
+          trace: this.traces.find(t => t.hash === this.hashFromRoute),
+          filter: this.filter,
+        });
         this.preselect = false;
         this.detect();
         this.scrollToElement();

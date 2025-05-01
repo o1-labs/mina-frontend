@@ -1,3 +1,4 @@
 export interface TracingOverviewCheckpointFilter {
-  deployment: number;
-}
+    deployment: number;
+    name: string;
+  }

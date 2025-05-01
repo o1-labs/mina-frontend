@@ -16,7 +16,8 @@ enum TracingBlocksActionTypes {
   TRACING_BLOCKS_FILTER = 'TRACING_BLOCKS_FILTER',
   TRACING_BLOCKS_GET_DEPLOYMENTS = 'TRACING_BLOCKS_GET_DEPLOYMENTS',
   TRACING_BLOCKS_GET_DEPLOYMENTS_SUCCESS = 'TRACING_BLOCKS_GET_DEPLOYMENTS_SUCCESS',
-  
+  TRACING_BLOCKS_GET_NODES = 'TRACING_BLOCKS_GET_NODES',
+  TRACING_BLOCKS_GET_NODES_SUCCESS = 'TRACING_BLOCKS_GET_NODES_SUCCESS'
 }
 
 export const TRACING_BLOCKS_INIT = TracingBlocksActionTypes.TRACING_BLOCKS_INIT;
@@ -30,6 +31,9 @@ export const TRACING_BLOCKS_SORT = TracingBlocksActionTypes.TRACING_BLOCKS_SORT;
 export const TRACING_BLOCKS_FILTER = TracingBlocksActionTypes.TRACING_BLOCKS_FILTER;
 export const TRACING_BLOCKS_GET_DEPLOYMENTS = TracingBlocksActionTypes.TRACING_BLOCKS_GET_DEPLOYMENTS;
 export const TRACING_BLOCKS_GET_DEPLOYMENTS_SUCCESS = TracingBlocksActionTypes.TRACING_BLOCKS_GET_DEPLOYMENTS_SUCCESS;
+export const TRACING_BLOCKS_GET_NODES = TracingBlocksActionTypes.TRACING_BLOCKS_GET_NODES;
+export const TRACING_BLOCKS_GET_NODES_SUCCESS = TracingBlocksActionTypes.TRACING_BLOCKS_GET_NODES_SUCCESS;
+
 
 export interface TracingBlocksAction extends FeatureAction<TracingBlocksActionTypes> {
   readonly type: TracingBlocksActionTypes;
@@ -45,7 +49,7 @@ export class TracingBlocksClose implements TracingBlocksAction {
 
 export class TracingBlocksGetTraces implements TracingBlocksAction {
   readonly type = TRACING_BLOCKS_GET_TRACES;
-  constructor(public payload: { deployment: number }) { }
+  constructor(public payload: TracingBlockFilter) { }
 }
 
 export class TracingBlocksGetTracesSuccess implements TracingBlocksAction {
@@ -57,7 +61,10 @@ export class TracingBlocksGetTracesSuccess implements TracingBlocksAction {
 export class TracingBlocksSelectRow implements TracingBlocksAction {
   readonly type = TRACING_BLOCKS_SELECT_ROW;
 
-  constructor(public payload: TracingBlockTrace) { }
+  constructor(public payload: {
+   filter: TracingBlockFilter,
+   trace: TracingBlockTrace
+  }) { }
 }
 
 export class TracingBlocksGetDetails implements TracingBlocksAction {
@@ -89,6 +96,14 @@ export class TracingBlocksGetDeploymentsSuccess implements TracingBlocksAction {
   constructor(public payload: number[]) { }
 }
 
+export class TracingBlocksGetNodes implements TracingBlocksAction {
+  readonly type = TRACING_BLOCKS_GET_NODES;
+  constructor(public payload: number) { }
+}
+export class TracingBlocksGetNodesSuccess implements TracingBlocksAction {
+  readonly type = TRACING_BLOCKS_GET_NODES_SUCCESS;
+  constructor(public payload: TracingBlockFilter[]) { }
+}
 export type TracingBlocksActions =
   | TracingBlocksInit
   | TracingBlocksClose
@@ -101,4 +116,6 @@ export type TracingBlocksActions =
   | TracingBlocksFilter
   | TracingBlocksGetDeployments
   | TracingBlocksGetDeploymentsSuccess
+  | TracingBlocksGetNodes
+  | TracingBlocksGetNodesSuccess
   ;
