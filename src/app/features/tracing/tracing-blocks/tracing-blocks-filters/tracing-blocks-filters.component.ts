@@ -66,8 +66,22 @@ export class TracingBlocksFiltersComponent extends ManualDetection implements On
       .pipe(untilDestroyed(this))
       .subscribe(deployments => {
         this.deployments = deployments;
+         if (this.deployments.length > 0) {
+                  this.store.dispatch({
+                    type: TRACING_BLOCKS_FILTER,
+                    payload: {
+                      ...this.filter,
+                      deployment: this.maxDeploymentId(),
+                    } as TracingBlockFilter,
+                  });
+                  this.store.dispatch({
+                    type: TRACING_BLOCKS_GET_NODES,
+                    payload: this.maxDeploymentId(),
+                  });
+                }
         this.detect();
       });
+
   }
 
   private listenToNodesChanges(): void {
@@ -75,6 +89,15 @@ export class TracingBlocksFiltersComponent extends ManualDetection implements On
       .pipe(untilDestroyed(this))
       .subscribe(nodes => {
         this.nodes = nodes;
+          if (!this.filter?.name) {
+                  this.store.dispatch({
+                    type: TRACING_BLOCKS_FILTER,
+                    payload: {
+                      ...this.filter,
+                      name: this.nodes[0].name,
+                    } as TracingBlockFilter,
+                  });
+                }
         this.detect();
       });
   }

@@ -10,6 +10,7 @@ import { TracingBlockTrace } from '@shared/types/tracing/blocks/tracing-block-tr
 import { TracingTraceGroup } from '@shared/types/tracing/blocks/tracing-trace-group.type';
 import {
   TRACING_BLOCKS_CLOSE,
+  TRACING_BLOCKS_FILTER,
   TRACING_BLOCKS_GET_DEPLOYMENTS,
   TRACING_BLOCKS_GET_DEPLOYMENTS_SUCCESS,
   TRACING_BLOCKS_GET_DETAILS,
@@ -51,7 +52,7 @@ export class TracingBlocksEffects extends MinaBaseEffect<TracingBlocksActions> {
 
     this.getTraces$ = createEffect(() =>
       this.actions$.pipe(
-        ofType(TRACING_BLOCKS_GET_TRACES),
+        ofType(TRACING_BLOCKS_FILTER),
         this.latestActionState<TracingBlocksGetTraces>(),
         switchMap(({ action }) =>
           this.tracingBlocksService.getTraces( action.payload )
