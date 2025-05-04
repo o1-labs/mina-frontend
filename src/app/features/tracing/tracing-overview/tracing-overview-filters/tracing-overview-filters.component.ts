@@ -37,10 +37,10 @@ export class TracingOverviewFiltersComponent extends ManualDetection implements 
 
 
   constructor(private router: Router,
-              private datePipe: DatePipe,
-              private overlay: Overlay,
-              private store: Store<MinaState>,
-              private viewContainerRef: ViewContainerRef) { super(); }
+    private datePipe: DatePipe,
+    private overlay: Overlay,
+    private store: Store<MinaState>,
+    private viewContainerRef: ViewContainerRef) { super(); }
 
   ngOnInit(): void {
     this.listenToFiltersChanges();
@@ -62,6 +62,19 @@ export class TracingOverviewFiltersComponent extends ManualDetection implements 
       .pipe(untilDestroyed(this))
       .subscribe(deployments => {
         this.deployments = deployments;
+        if (this.deployments.length > 0) {
+          this.store.dispatch({
+            type: TRACING_OVERVIEW_FILTER,
+            payload: {
+              ...this.filter,
+              deployment: this.maxDeploymentId(),
+            } as TracingOverviewCheckpointFilter,
+          });
+          this.store.dispatch({
+            type: TRACING_OVERVIEW_GET_NODES,
+            payload: this.maxDeploymentId(),
+          });
+        }
         this.detect();
       });
   }
@@ -72,6 +85,16 @@ export class TracingOverviewFiltersComponent extends ManualDetection implements 
       .subscribe(nodes => {
         this.nodes = nodes;
         this.detect();
+
+        if (!this.filter?.name) {
+          this.store.dispatch({
+            type: TRACING_OVERVIEW_FILTER,
+            payload: {
+              ...this.filter,
+              name: this.nodes[0].name,
+            } as TracingOverviewCheckpointFilter,
+          });
+        }
       });
   }
 
@@ -83,9 +106,9 @@ export class TracingOverviewFiltersComponent extends ManualDetection implements 
   }
 
   openDeploymentDropdown(event: MouseEvent): void {
-    this.deploymentSelectorOverlay = this.openDropdown(event,this.deploymentDrTemplate, this.deploymentDropdownTrigger, this.deploymentSelectorOverlay)
+    this.deploymentSelectorOverlay = this.openDropdown(event, this.deploymentDrTemplate, this.deploymentDropdownTrigger, this.deploymentSelectorOverlay)
   }
-  
+
   openDropdown(event: MouseEvent, drTemplate: TemplateRef<void>, dropdownTrigger: ElementRef<HTMLDivElement>, selectorOverlay: OverlayRef): OverlayRef {
     if (selectorOverlay?.hasAttached()) {
       selectorOverlay.detach();
@@ -111,7 +134,7 @@ export class TracingOverviewFiltersComponent extends ManualDetection implements 
     selectorOverlay.attach(portal);
     return selectorOverlay;
   }
-  
+
   maxDeploymentId(): number {
     return Math.max(...this.deployments);
   }
@@ -125,7 +148,7 @@ export class TracingOverviewFiltersComponent extends ManualDetection implements 
         deployment: maxDeployment,
       } as TracingOverviewCheckpointFilter,
     });
-    this.nodes = []; 
+    this.nodes = [];
     this.deploymentSelectorOverlay.detach();
     this.store.dispatch({
       type: TRACING_OVERVIEW_GET_NODES,
@@ -171,13 +194,11 @@ export class TracingOverviewFiltersComponent extends ManualDetection implements 
         name: name,
       } as TracingOverviewCheckpointFilter,
     });
-
-    this.deploymentSelectorOverlay.detach();
     this.nodesSelectorOverlay.detach();
   }
 
   getNodes(): TracingOverviewCheckpointFilter[] {
-     return Array.from(new Set(this.nodes));
+    return Array.from(new Set(this.nodes));
   }
 
 }
