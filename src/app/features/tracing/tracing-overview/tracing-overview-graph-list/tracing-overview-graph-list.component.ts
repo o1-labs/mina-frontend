@@ -26,7 +26,6 @@ export class TracingOverviewGraphListComponent extends StoreDispatcher implement
     this.listenToCheckpointChanges();
     this.listenToCondensedViewChange();
     this.listenToMenuCollapsing();
-    this.listenToFilterChanges();
   }
 
   private listenToCheckpointChanges(): void {
@@ -50,10 +49,4 @@ export class TracingOverviewGraphListComponent extends StoreDispatcher implement
     });
   }
 
-  private listenToFilterChanges(): void {
-    this.select(selectTracingOverviewCheckpointsFilter, (filter: TracingOverviewCheckpointFilter) => {
-      this.filter = filter;
-      this.detect();
-    });
-  }
 }
