@@ -19,6 +19,7 @@
            (mouseleave)="detachOverlay()">
         <div *ngFor="let col of checkpoint.columns; let i=index; trackBy: trackSteps"
              (mouseenter)="onColumnHover(col)"
+             (clickOutside)="detachOverlay()"
              class="gr-col flex-column-reverse">
           <div *ngFor="let square of [].constructor(col.squareCount); let j=index"
                [class.b-right]="j > checkpoint.columns[i + 1]?.squareCount - 1"

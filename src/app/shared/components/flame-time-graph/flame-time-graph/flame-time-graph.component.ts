@@ -52,9 +52,15 @@ export class FlameTimeGraphComponent extends ManualDetection {
   private tooltipComponent: ComponentRef<FlameTimeGraphTooltipComponent>;
   private expandedGraphComponent: ComponentRef<FlameTimeGraphComponent>;
 
-  constructor(private overlay: Overlay) { super(); }
+  constructor(private overlay: Overlay) { 
+    super(); 
+  }
 
   onColumnHover(column: FlameTimeGraphColumn): void {
+    if (!this.tooltipComponent) {
+      return
+    }
+    
     this.hoveredColumn = column;
     this.tooltipComponent.instance.xSteps = this.xSteps;
     this.tooltipComponent.instance.range = this.ranges[this.checkpoint.columns.indexOf(column)];
@@ -64,6 +70,19 @@ export class FlameTimeGraphComponent extends ManualDetection {
     this.tooltipComponent.instance.calls = column.count;
     this.tooltipComponent.instance.totalTime = column.totalTime;
     this.tooltipComponent.instance.detect();
+  }
+
+  ngOnDestroy(): void {
+    if (this.overlayRef?.hasAttached()) {
+      this.overlayRef.detach();
+      this.overlayRef.dispose();
+    }
+    if (this.tooltipComponent) {
+      this.tooltipComponent.destroy();
+    }
+    if (this.expandedGraphComponent) {
+      this.expandedGraphComponent.destroy();
+    }
   }
 
   attachGraphTooltip(xStepsRef: HTMLDivElement): void {
@@ -88,6 +107,7 @@ export class FlameTimeGraphComponent extends ManualDetection {
     const portal = new ComponentPortal(FlameTimeGraphTooltipComponent);
     this.tooltipComponent = this.overlayRef.attach<FlameTimeGraphTooltipComponent>(portal);
   }
+
 
   detachOverlay(): void {
     if (this.overlayRef?.hasAttached()) {

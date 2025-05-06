@@ -86,7 +86,7 @@ export class TracingOverviewFiltersComponent extends ManualDetection implements 
         this.nodes = nodes;
         this.detect();
 
-        if (!this.filter?.name) {
+        if (!this.filter?.name && this.nodes.length > 0) {
           this.store.dispatch({
             type: TRACING_OVERVIEW_FILTER,
             payload: {
