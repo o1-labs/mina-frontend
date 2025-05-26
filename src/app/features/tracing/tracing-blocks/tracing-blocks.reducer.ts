@@ -75,7 +75,7 @@ export function reducer(state: TracingBlocksState = initialState, action: Tracin
     case TRACING_BLOCKS_SELECT_ROW: {
       return {
         ...state,
-        activeTrace: action.payload.trace,
+        activeTrace: action.payload ? action.payload.trace : undefined,
       };
     }
 
