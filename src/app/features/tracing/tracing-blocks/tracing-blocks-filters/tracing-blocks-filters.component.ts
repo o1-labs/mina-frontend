@@ -89,7 +89,7 @@ export class TracingBlocksFiltersComponent extends ManualDetection implements On
       .pipe(untilDestroyed(this))
       .subscribe(nodes => {
         this.nodes = nodes;
-          if (!this.filter?.name) {
+          if (!this.filter?.name && this.nodes.length > 0) {
                   this.store.dispatch({
                     type: TRACING_BLOCKS_FILTER,
                     payload: {
@@ -97,8 +97,9 @@ export class TracingBlocksFiltersComponent extends ManualDetection implements On
                       name: this.nodes[0].name,
                     } as TracingBlockFilter,
                   });
-                }
-        this.detect();
+          this.detect();
+          }
+          
       });
   }
 
