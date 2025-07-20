@@ -10,6 +10,9 @@ enum ExperimentsActionTypes {
   EXPERIMENTS_CLOSE = 'EXPERIMENTS_CLOSE',
   EXPERIMENTS_GET = 'EXPERIMENTS_GET',
   EXPERIMENTS_FILTER = 'EXPERIMENTS_FILTER',
+  EXPERIMENTS_SELECT_ROW = 'EXPERIMENTS_SELECT_ROW',
+  EXPERIMENTS_GET_DETAILS = 'EXPERIMENTS_GET_DETAILS',
+  EXPERIMENTS_GET_DETAILS_SUCCESS = 'EXPERIMENTS_GET_DETAILS_SUCCESS',
 }
 
 export const EXPERIMENTS_INIT = ExperimentsActionTypes.EXPERIMENTS_INIT;
@@ -18,6 +21,9 @@ export const EXPERIMENTS_SORT = ExperimentsActionTypes.EXPERIMENTS_SORT;
 export const EXPERIMENTS_CLOSE = ExperimentsActionTypes.EXPERIMENTS_CLOSE;
 export const EXPERIMENTS_GET = ExperimentsActionTypes.EXPERIMENTS_GET;
 export const EXPERIMENTS_FILTER = ExperimentsActionTypes.EXPERIMENTS_FILTER;
+export const EXPERIMENTS_SELECT_ROW = ExperimentsActionTypes.EXPERIMENTS_SELECT_ROW;
+export const EXPERIMENTS_GET_DETAILS = ExperimentsActionTypes.EXPERIMENTS_GET_DETAILS;
+export const EXPERIMENTS_GET_DETAILS_SUCCESS = ExperimentsActionTypes.EXPERIMENTS_GET_DETAILS_SUCCESS;
 
 export interface ExperimentsAction extends FeatureAction<ExperimentsActionTypes> {
   readonly type: ExperimentsActionTypes;
@@ -49,6 +55,20 @@ export class ExperimentsDataFilter implements ExperimentsAction {
   constructor(public payload: ExperimentsFilter) {}
 }
 
+export class ExperimentsSelectRow implements ExperimentsAction {
+  readonly type = ExperimentsActionTypes.EXPERIMENTS_SELECT_ROW;
+  constructor(public payload: { experiment: Experiment; filter: ExperimentsFilter } | null) {}
+}
+export class ExperimentsGetDetails implements ExperimentsAction {
+  readonly type = ExperimentsActionTypes.EXPERIMENTS_GET_DETAILS;
+  constructor(public payload: { experiment: Experiment }) {}
+}
+
+export class ExperimentsGetDetailsSuccess implements ExperimentsAction {
+  readonly type = ExperimentsActionTypes.EXPERIMENTS_GET_DETAILS_SUCCESS;
+  constructor(public payload: Experiment) {}
+}
+
 export type ExperimentsActions =
   | ExperimentsInit
   | ExperimentsGetSuccess
@@ -56,4 +76,7 @@ export type ExperimentsActions =
   | ExperimentsSort
   | ExperimentsClose
   | ExperimentsDataFilter
+  | ExperimentsSelectRow
+  | ExperimentsGetDetails
+  | ExperimentsGetDetailsSuccess
   ;

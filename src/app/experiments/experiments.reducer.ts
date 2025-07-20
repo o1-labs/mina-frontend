@@ -7,6 +7,8 @@ EXPERIMENTS_GET_SUCCESS,
 EXPERIMENTS_SORT,
 EXPERIMENTS_FILTER,
 EXPERIMENTS_CLOSE,
+EXPERIMENTS_SELECT_ROW,
+EXPERIMENTS_GET_DETAILS_SUCCESS,
 ExperimentsActions
 } from './experiments.actions';
 import { Experiment } from '@app/shared/types/experiments/experiments.type';
@@ -19,6 +21,7 @@ const initialState: ExperimentsState = {
     sortDirection: SortDirection.ASC,
   },
   isLoading: false,
+  activeExperiment: undefined,
   filter: {
     deployment: undefined,
     experiment: undefined,
@@ -71,6 +74,20 @@ export function reducer(state: ExperimentsState = initialState, action: Experime
           ...action.payload,
         },
       }
+    }
+
+    case EXPERIMENTS_SELECT_ROW: {
+      return {
+        ...state,
+        activeExperiment: action.payload?.experiment as any, // Convert to ExperimentDetails
+      };
+    }
+
+    case EXPERIMENTS_GET_DETAILS_SUCCESS: {
+      return {
+        ...state,
+        activeExperiment: action.payload as any,
+      };
     }
 
     case EXPERIMENTS_CLOSE:

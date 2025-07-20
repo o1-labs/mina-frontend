@@ -12,7 +12,7 @@ module.exports = {
       FETCHER_PORT: JSON.stringify(process.env.FETCHER_PORT ?? "4000"),
       EXPERIMENTS_BACKEND_API_ENDPOINT: JSON.stringify(
         process.env.EXPERIMENTS_BACKEND_API_ENDPOINT ??
-          "http://localhost:3003/api/experiments"
+          "http://65.21.209.217:3003/api/experiments"
       ),
     }),
   ],

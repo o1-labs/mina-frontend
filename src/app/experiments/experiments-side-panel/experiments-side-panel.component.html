@@ -1,0 +1,146 @@
+<div class="h-xl flex-row flex-between p-12 header-section">
+  <div class="header-content">
+    <span class="experiment-name f-600">{{ activeExperiment?.name }}</span>
+    <div class="header-status-badge" [class]="'status-badge-' + activeExperiment?.status?.toLowerCase()">
+      <span class="mina-icon status-icon" [class]="getStatusIcon(activeExperiment?.status)"></span>
+      <span class="status-text">{{ activeExperiment?.status }}</span>
+    </div>
+  </div>
+  <span class="mina-icon pointer tertiary primary-hover f-18"
+        (click)="closeSidePanel()">close
+  </span>
+</div>
+<div class="h-lg tab-group pl-12 pb-10 pr-10">
+  <button class="tab mr-10" [class.selected]="selectedTabIndex === 0"
+          (click)="selectTab(0)">Parameters
+  </button>
+  <button class="tab mr-10" [class.selected]="selectedTabIndex === 1"
+          (click)="selectTab(1)">
+    Logs
+    <span *ngIf="hasErrors" class="ml-5 error-indicator" title="Contains errors">⚠</span>
+    <span *ngIf="hasWarnings && !hasErrors" class="ml-5 warning-indicator" title="Contains warnings">⚠</span>
+  </button>
+</div>
+
+<div class="flex-column p-relative flex-grow">
+  <div class="p-absolute-cover">
+    <ng-container [ngSwitch]="selectedTabIndex">
+      <ng-container *ngSwitchCase="0">
+        <div class="h-100 overflow-y-auto pr-12">
+          <div *ngIf="!activeExperiment" class="tertiary pl-12 monospace">Loading...</div>
+          <div *ngIf="activeExperiment" class="flex-column">
+            <!-- Basic Info -->
+            <div class="p-12 border-bottom">
+              <h3 class="mb-8">Experiment Information</h3>
+              
+              <!-- Enhanced Status Section -->
+              <div class="status-section mb-16">
+                <div class="status-container">
+                  <span class="status-label">Status:</span>
+                  <div class="status-badge" [class]="'status-badge-' + activeExperiment.status?.toLowerCase()">
+                    <span class="status-icon" [class]="getStatusIcon(activeExperiment.status)"></span>
+                    <span class="status-text">{{ activeExperiment.status }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid-2-columns gap-12">
+                <div><strong>Name:</strong> {{ activeExperiment.name }}</div>
+                <div><strong>Current Step:</strong> {{ activeExperiment.current_step_no }} - {{ activeExperiment.current_step_name }}</div>
+                <div><strong>Created:</strong> {{ activeExperiment.created_at | date: 'medium' }}</div>
+                <div><strong>Updated:</strong> {{ activeExperiment.updated_at | date: 'medium' }}</div>
+                <div *ngIf="activeExperiment.ended_at" class="grid-span-2"><strong>Ended:</strong> {{ activeExperiment.ended_at | date: 'medium' }}</div>
+              </div>
+              <div *ngIf="activeExperiment.description" class="mt-12">
+                <strong>Description:</strong> {{ activeExperiment.description }}
+              </div>
+              <div *ngIf="activeExperiment.comment" class="mt-12">
+                <strong>Comment:</strong> {{ activeExperiment.comment }}
+              </div>
+            </div>
+            
+            <!-- Setup JSON -->
+            <div class="p-12">
+              <h3 class="mb-8">Setup Configuration</h3>
+              <div *ngIf="!activeExperiment.setup_json" class="tertiary monospace">null</div>
+              <mina-json-viewer *ngIf="activeExperiment.setup_json"
+                                [json]="activeExperiment.setup_json"
+                                [expandTracking]="parametersExpandTracking"
+                                [expanded]="false"></mina-json-viewer>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+      <ng-container *ngSwitchCase="1">
+        <div class="h-100 overflow-y-auto pr-12 flex-column">
+          <div *ngIf="!activeExperiment" class="tertiary pl-12 monospace">Loading...</div>
+          <div *ngIf="activeExperiment" class="flex-column">
+            
+            <!-- Errors Section -->
+            <div *ngIf="activeExperiment.errors?.length" class="border-bottom">
+              <div class="p-12 cursor-pointer flex-row flex-between error-section-header"
+                   (click)="toggleSection('errors')">
+                <span class="error-text f-600">
+                  <span class="mina-icon mr-5">error</span>
+                  Errors ({{ activeExperiment.errors.length }})
+                </span>
+                <span class="mina-icon">{{ expandedSections.errors ? 'expand_less' : 'expand_more' }}</span>
+              </div>
+              <div *ngIf="expandedSections.errors" class="pl-12 pr-12 pb-12">
+                <div *ngFor="let error of activeExperiment.errors; let i = index" 
+                     class="mb-8 p-8 error-item">
+                  <div class="error-text f-600 mb-4">Error {{ i + 1 }}:</div>
+                  <div class="monospace text-break">{{ error }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Warnings Section -->
+            <div *ngIf="activeExperiment.warnings?.length" class="border-bottom">
+              <div class="p-12 cursor-pointer flex-row flex-between warning-section-header"
+                   (click)="toggleSection('warnings')">
+                <span class="warning-text f-600">
+                  <span class="mina-icon mr-5">warning</span>
+                  Warnings ({{ activeExperiment.warnings.length }})
+                </span>
+                <span class="mina-icon">{{ expandedSections.warnings ? 'expand_less' : 'expand_more' }}</span>
+              </div>
+              <div *ngIf="expandedSections.warnings" class="pl-12 pr-12 pb-12">
+                <div *ngFor="let warning of activeExperiment.warnings; let i = index" 
+                     class="mb-8 p-8 warning-item">
+                  <div class="warning-text f-600 mb-4">Warning {{ i + 1 }}:</div>
+                  <div class="monospace text-break">{{ warning }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Logs Section -->
+            <div *ngIf="activeExperiment.logs?.length">
+              <div class="p-12 cursor-pointer flex-row flex-between log-section-header"
+                   (click)="toggleSection('logs')">
+                <span class="secondary f-600">
+                  <span class="mina-icon mr-5">description</span>
+                  Logs ({{ activeExperiment.logs.length }})
+                </span>
+                <span class="mina-icon">{{ expandedSections.logs ? 'expand_less' : 'expand_more' }}</span>
+              </div>
+              <div *ngIf="expandedSections.logs" class="pl-12 pr-12 pb-12">
+                <div *ngFor="let log of activeExperiment.logs; let i = index" 
+                     class="mb-8 p-8 log-item">
+                  <div class="secondary f-600 mb-4">Log {{ i + 1 }}:</div>
+                  <div class="monospace text-break">{{ log }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Empty State -->
+            <div *ngIf="!activeExperiment.errors?.length && !activeExperiment.warnings?.length && !activeExperiment.logs?.length" 
+                 class="p-12 tertiary text-center">
+              No logs, errors, or warnings available
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </ng-container>
+  </div>
+</div>

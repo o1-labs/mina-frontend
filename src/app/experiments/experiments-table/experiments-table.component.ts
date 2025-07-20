@@ -6,9 +6,15 @@ import {
   TableSort,
 } from '@app/shared/types/shared/table-sort.type';
 import { Experiment } from '@app/shared/types/experiments/experiments.type';
-import { ExperimentsSort } from '../experiments.actions';
-import { selectExperimentFilter, selectExperimentsData, selectExperimentSort } from '../experiments.state';
+import { ExperimentsSelectRow, ExperimentsSort } from '../experiments.actions';
+import { selectExperimentFilter, selectExperimentsData, selectExperimentSort, selectExperimentDetails } from '../experiments.state';
 import { ExperimentsFilter } from '@app/shared/types/experiments/experiments-filters.type';
+import { Router } from '@angular/router';
+import { Routes } from '@app/shared/enums/routes.enum';
+import { getMergedRoute } from '@app/shared/router/router-state.selectors';
+import { MergedRoute } from '@app/shared/router/merged-route';
+import { ExperimentDetails } from '@app/shared/types/experiments/experiments-details.type';
+import { filter } from 'rxjs';
 
 
 @Component({
@@ -36,8 +42,15 @@ export class ExperimentsTableComponent
     { name: 'total txns' },
     { name: 'zkApp txns' },
   ];
+  
   currentSort: TableSort<Experiment>;
   experiments: Experiment[];
+  activeExperiment: Experiment;
+  filter: ExperimentsFilter;
+  private expFromRoute: string;
+  private preselect: boolean;
+
+  constructor(private router: Router) { super(); }
 
   protected override setupTable(): void {
     this.table.gridTemplateColumns = [
@@ -65,18 +78,55 @@ export class ExperimentsTableComponent
     this.listenToExperimentsChanges();
     this.listenToSortingChanges();
     this.listenToFilterChanges();
+    this.listenToRouteChange();
+    this.listenToActiveExperimentChange();
   }
 
   private listenToExperimentsChanges(): void {
     this.select(selectExperimentsData, (experiments: Experiment[]) => {
-      this.experiments = experiments
+      this.experiments = experiments;
       this.table.rows = this.experiments;
       this.table.detect();
-    });
+      if (this.preselect) {
+        this.dispatch(ExperimentsSelectRow, {
+          experiment: this.experiments.find(e => e.exp === this.expFromRoute),
+          filter: this.filter,
+        });
+        this.preselect = false;
+        this.detect();
+        this.scrollToElement();
+        return;
+      }
+      this.detect();
+    }, filter(Boolean));
+  }
+
+  protected override onRowClick(experiment: Experiment): void {
+      if (this.activeExperiment?.exp !== experiment.exp) {
+        this.router.navigate([Routes.EXPERIMENTS, experiment.exp], { queryParamsHandling: 'merge' });
+        this.dispatch(ExperimentsSelectRow, { experiment, filter: this.filter });
+      }
+  }
+  
+    private scrollToElement(): void {
+      if (!this.expFromRoute) {
+        return;
+      }
+      this.table.scrollToElement(t => t.exp === this.expFromRoute);
+    }
+
+  private listenToRouteChange(): void {
+        this.select(getMergedRoute, (route: MergedRoute) => {
+          if (route.params['exp'] && this.experiments.length === 0) {
+            this.expFromRoute = route.params['exp'];
+            this.preselect = true;
+          }
+        });
   }
 
   private listenToFilterChanges(): void {
     this.select(selectExperimentFilter, (filter: ExperimentsFilter) => {
+      this.filter = filter;
       this.table.rows = this.experiments.filter((experiment: Experiment) => {
         if (filter.deployment && filter.deployment !== experiment.deployment_id) {
           return false;
@@ -97,6 +147,15 @@ export class ExperimentsTableComponent
     this.select(selectExperimentSort, (sort: TableSort<Experiment>) => {
       this.currentSort = sort;
       this.table.detect();
+    });
+  }
+
+  private listenToActiveExperimentChange(): void {
+    this.select(selectExperimentDetails, (activeExperiment: ExperimentDetails) => {
+      this.activeExperiment = activeExperiment as any; // Cast to Experiment for now
+      this.table.activeRow = this.activeExperiment;
+      this.table.detect();
+      this.detect();
     });
   }
 
