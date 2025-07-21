@@ -2,18 +2,35 @@
   <ng-container #minaTable></ng-container>
 
   <ng-template #rowTemplate let-row="row" let-i="i">
-    <span class="primary">
-      <mina-copy
-        [value]="row.exp"
-        [display]="row.exp"
-        [ngClass]="{ 'bold-text': shouldMakeBoldExpName(i) }"
-      ></mina-copy>
+    <span class="primary expandable-cell" [class.group-header]="isGroupHeader(row)" [class.child-row]="isChildRow(row)">
+      <!-- Expand icon only for group headers -->
+      <span *ngIf="isGroupHeader(row) && getTotalRounds(row) > 1" 
+            class="expand-icon" 
+            (click)="toggleExperimentExpansion(row, $event)">
+        <span class="mina-icon">{{ getExpandIcon(row) }}</span>
+      </span>
+      
+      <!-- Indentation for child rows -->
+      <span *ngIf="isChildRow(row)" class="child-indent"></span>
+      
+      <!-- Experiment name with round count for group headers -->
+      <div class="experiment-info">
+        <mina-copy
+          [value]="row.exp"
+          [display]="row.exp"
+          [ngClass]="{ 'bold-text': isGroupHeader(row), 'summary-text': isSummaryRow(row) }"
+        ></mina-copy>
+        <span *ngIf="isGroupHeader(row) && getTotalRounds(row) > 1" 
+              class="rounds-count"
+              [class.summary-badge]="isSummaryRow(row)">({{ getTotalRounds(row) }} rounds)</span>
+      </div>
     </span>
-    <span class="secondary">{{ row.round }}</span>
-    <span class="secondary">{{ row.rate_min }}</span>
-    <span class="secondary">{{ row.payment_rate_min }}</span>
-    <span class="secondary">{{ row.zkapp_rate_min }}</span>
-    <span class="secondary">
+    
+    <span class="secondary" [class.child-row]="isChildRow(row)">{{ row.round }}</span>
+    <span class="secondary" [class.child-row]="isChildRow(row)">{{ row.rate_min }}</span>
+    <span class="secondary" [class.child-row]="isChildRow(row)">{{ row.payment_rate_min }}</span>
+    <span class="secondary" [class.child-row]="isChildRow(row)">{{ row.zkapp_rate_min }}</span>
+    <span class="secondary" [class.child-row]="isChildRow(row)">
       <ng-container *ngIf="row.duration.days">
         {{ row.duration.days }}d
       </ng-container>
@@ -27,7 +44,7 @@
         {{ row.duration.seconds }}s
       </ng-container>
     </span>
-    <span class="secondary">
+    <span class="secondary" [class.child-row]="isChildRow(row)">
       <ng-container *ngIf="row.max_latency.days">
         {{ row.max_latency.days }}d
       </ng-container>
@@ -46,24 +63,27 @@
     </span>
     <span
       class="missed"
+      [class.child-row]="isChildRow(row)"
       [ngClass]="{ 'bold-text': shouldMakeBoldStatusRate(i, 'missed') }"
     >
       {{ row.missed }}
     </span>
     <span
       class="failed"
+      [class.child-row]="isChildRow(row)"
       [ngClass]="{ 'bold-text': shouldMakeBoldStatusRate(i, 'failed') }"
     >
       {{ row.failed }}
     </span>
     <span
       class="successful"
+      [class.child-row]="isChildRow(row)"
       [ngClass]="{ 'bold-text': shouldMakeBoldStatusRate(i, 'successful') }"
     >
       {{ row.successful }}
     </span>
-    <span>{{ row.start | date : "long" }}</span>
-    <span class="secondary">{{ row.total }}</span>
-    <span class="secondary">{{ row.zkapps }}</span>
+    <span [class.child-row]="isChildRow(row)">{{ row.start | date : "long" }}</span>
+    <span class="secondary" [class.child-row]="isChildRow(row)">{{ row.total }}</span>
+    <span class="secondary" [class.child-row]="isChildRow(row)">{{ row.zkapps }}</span>
   </ng-template>
 </div>

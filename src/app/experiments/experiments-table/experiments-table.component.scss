@@ -52,3 +52,123 @@
     padding-bottom: 30px;
   }
 }
+
+// Grouped table styles
+.expandable-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-width: 0; // Allow content to shrink
+  overflow: hidden;
+
+  &.group-header {
+    font-weight: 600;
+    background-color: rgba(0, 0, 0, 0.02);
+  }
+
+  &.child-row {
+    background-color: rgba(0, 0, 0, 0.01);
+  }
+
+  .experiment-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+
+    mina-copy {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      
+      // Ensure the inner content truncates properly
+      ::ng-deep {
+        .copy-container,
+        .copy-text {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          max-width: 100%;
+        }
+      }
+    }
+  }
+
+  .rounds-count {
+    font-size: 9px;
+    color: #666;
+    font-weight: 400;
+    background: rgba(0, 123, 255, 0.1);
+    padding: 1px 4px;
+    border-radius: 6px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    line-height: 1.1;
+    min-width: fit-content;
+
+    &.summary-badge {
+      background: rgba(0, 123, 255, 0.2);
+      color: #0056b3;
+      font-weight: 500;
+    }
+  }
+
+  .summary-text {
+    color: #0056b3 !important;
+    font-weight: 600 !important;
+  }
+}
+
+.expand-icon {
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+
+  &:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+  }
+
+  .mina-icon {
+    font-size: 14px;
+    transition: transform 0.2s ease;
+    color: #007bff;
+  }
+}
+
+.child-indent {
+  width: 20px;
+  height: 1px;
+  position: relative;
+  flex-shrink: 0;
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: -10px;
+    bottom: -10px;
+    width: 1px;
+    background: #ddd;
+  }
+}
+
+// Child row styling
+.child-row {
+  background-color: rgba(0, 123, 255, 0.02);
+  font-size: 14px;
+  color: #666;
+  
+  &.primary {
+    padding-left: 32px;
+  }
+}
