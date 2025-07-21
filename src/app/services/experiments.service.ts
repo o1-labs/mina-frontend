@@ -17,6 +17,7 @@ export class ExperimentsService {
 
   getExperimentDetails(experimentName: string): Observable<ExperimentDetails[]> {
     // Note: API returns array, we'll take the first item in the effect
-    return this.http.get<ExperimentDetails[]>(`http://65.21.209.217:3003/api/experiment/${experimentName}`);
+    const url = `${this.apiUrl.replace('/experiments', '')}/experiment/${experimentName}`;
+    return this.http.get<ExperimentDetails[]>(url);
   }
 }
