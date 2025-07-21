@@ -1,10 +1,16 @@
 <div class="h-xl flex-row flex-between p-12 header-section">
   <div class="header-content">
-    <span class="experiment-name f-600">{{ activeExperiment?.name }}</span>
-    <div class="header-status-badge" [class]="'status-badge-' + activeExperiment?.status?.toLowerCase()">
-      <span class="mina-icon status-icon" [class]="getStatusIcon(activeExperiment?.status)"></span>
-      <span class="status-text">{{ activeExperiment?.status }}</span>
-    </div>
+    <ng-container *ngIf="!isLoadingDetails; else headerSkeleton">
+      <span class="experiment-name f-600">{{ activeExperiment?.name }}</span>
+      <div class="header-status-badge" [class]="'status-badge-' + activeExperiment?.status?.toLowerCase()">
+        <span class="mina-icon status-icon" [class]="getStatusIcon(activeExperiment?.status)"></span>
+        <span class="status-text">{{ activeExperiment?.status }}</span>
+      </div>
+    </ng-container>
+    <ng-template #headerSkeleton>
+      <div class="skeleton-text skeleton-title"></div>
+      <div class="skeleton-badge"></div>
+    </ng-template>
   </div>
   <span class="mina-icon pointer tertiary primary-hover f-18"
         (click)="closeSidePanel()">close
@@ -27,8 +33,28 @@
     <ng-container [ngSwitch]="selectedTabIndex">
       <ng-container *ngSwitchCase="0">
         <div class="h-100 overflow-y-auto pr-12">
-          <div *ngIf="!activeExperiment" class="tertiary pl-12 monospace">Loading...</div>
-          <div *ngIf="activeExperiment" class="flex-column">
+          <div *ngIf="isLoadingDetails" class="loading-container">
+            <div class="spinner-container">
+              <div class="spinner"></div>
+              <div class="loading-text">Loading experiment details...</div>
+            </div>
+            <div class="flex-column p-12">
+              <div class="skeleton-section">
+                <div class="skeleton-text skeleton-h3 mb-8"></div>
+                <div class="skeleton-grid">
+                  <div class="skeleton-text skeleton-line"></div>
+                  <div class="skeleton-text skeleton-line"></div>
+                  <div class="skeleton-text skeleton-line"></div>
+                  <div class="skeleton-text skeleton-line"></div>
+                </div>
+              </div>
+              <div class="skeleton-section">
+                <div class="skeleton-text skeleton-h3 mb-8"></div>
+                <div class="skeleton-text skeleton-json"></div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="!isLoadingDetails && activeExperiment" class="flex-column fade-in">
             <!-- Basic Info -->
             <div class="p-12 border-bottom">
               <h3 class="mb-8">Experiment Information</h3>
@@ -73,8 +99,23 @@
       </ng-container>
       <ng-container *ngSwitchCase="1">
         <div class="h-100 overflow-y-auto pr-12 flex-column">
-          <div *ngIf="!activeExperiment" class="tertiary pl-12 monospace">Loading...</div>
-          <div *ngIf="activeExperiment" class="flex-column">
+          <div *ngIf="isLoadingDetails" class="loading-container">
+            <div class="spinner-container">
+              <div class="spinner"></div>
+              <div class="loading-text">Loading logs and errors...</div>
+            </div>
+            <div class="flex-column p-12">
+              <div class="skeleton-section">
+                <div class="skeleton-text skeleton-line mb-8"></div>
+                <div class="skeleton-text skeleton-block"></div>
+              </div>
+              <div class="skeleton-section">
+                <div class="skeleton-text skeleton-line mb-8"></div>
+                <div class="skeleton-text skeleton-block"></div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="!isLoadingDetails && activeExperiment" class="flex-column fade-in">
             
             <!-- Errors Section -->
             <div *ngIf="activeExperiment.errors?.length" class="border-bottom">

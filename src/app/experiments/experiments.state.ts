@@ -11,6 +11,7 @@ export interface ExperimentsState {
   data: Experiment[];
   activeExperiment: ExperimentDetails;
   isLoading: boolean;
+  isLoadingDetails: boolean;
 }
 
 const select = <T>(selector: (state: ExperimentsState) => T): MemoizedSelector<MinaState, T> => createSelector(
@@ -25,3 +26,4 @@ export const selectExperimentFilter = select(((state: ExperimentsState): Experim
 export const selectExperimentSort = select(((state: ExperimentsState): TableSort<Experiment> => state.sort));
 export const selectExperimentLoad = select(((state: ExperimentsState): boolean => state.isLoading));
 export const selectExperimentDetails = select(((state: ExperimentsState): ExperimentDetails => state.activeExperiment));
+export const selectExperimentDetailsLoading = select(((state: ExperimentsState): boolean => state.isLoadingDetails));

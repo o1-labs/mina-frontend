@@ -6,7 +6,7 @@ import { ExpandTracking } from '@shared/components/mina-json-viewer/mina-json-vi
 import { StoreDispatcher } from '@shared/base-classes/store-dispatcher.class';
 import { ExperimentDetails } from '@app/shared/types/experiments/experiments-details.type';
 import { ExperimentsSelectRow } from '../experiments.actions';
-import { selectExperimentDetails } from '../experiments.state';
+import { selectExperimentDetails, selectExperimentDetailsLoading } from '../experiments.state';
 
 interface ExpandedSections {
   errors: boolean;
@@ -26,6 +26,7 @@ export class ExperimentsSidePanelComponent extends StoreDispatcher implements On
   parametersExpandTracking: ExpandTracking = {};
   selectedTabIndex: number = 0;
   activeExperiment: ExperimentDetails;
+  isLoadingDetails: boolean = false;
   
   expandedSections: ExpandedSections = {
     errors: true,
@@ -37,6 +38,7 @@ export class ExperimentsSidePanelComponent extends StoreDispatcher implements On
 
   ngOnInit(): void {
     this.listenToActiveExperimentChange();
+    this.listenToLoadingStateChange();
   }
 
   get hasErrors(): boolean {
@@ -84,6 +86,13 @@ export class ExperimentsSidePanelComponent extends StoreDispatcher implements On
       this.activeExperiment = experiment;
       this.detect();
     }, filter(t => !!t));
+  }
+
+  private listenToLoadingStateChange(): void {
+    this.select(selectExperimentDetailsLoading, (isLoading: boolean) => {
+      this.isLoadingDetails = isLoading;
+      this.detect();
+    });
   }
 
   closeSidePanel(): void {
