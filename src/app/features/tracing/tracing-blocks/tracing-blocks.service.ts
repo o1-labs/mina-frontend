@@ -6,6 +6,8 @@ import { TracingTraceGroup } from '@shared/types/tracing/blocks/tracing-trace-gr
 import { ONE_THOUSAND } from '@shared/constants/unit-measurements';
 import { TracingTraceCheckpoint } from '@shared/types/tracing/blocks/tracing-trace-checkpoint.type';
 import { TracingGraphQlService } from '@core/services/tracing-graph-ql.service';
+import { TracingOverviewFilter } from '../tracing-overview/tracing-overview.actions';
+import { TracingBlockFilter } from '@app/shared/types/tracing/blocks/tracing-block-filter.type';
 
 @Injectable({
   providedIn: 'root',
@@ -14,8 +16,17 @@ export class TracingBlocksService {
 
   constructor(private tracingGQL: TracingGraphQlService) { }
 
-  getTraces(): Observable<TracingBlockTrace[]> {
-    return this.tracingGQL.query<any>('getTraces', `{ blockTraces }`)
+  getTraces(filter: TracingBlockFilter): Observable<TracingBlockTrace[]> {
+    if (!filter) {
+      return new Observable<TracingBlockTrace[]>(subscriber => {
+        subscriber.next([]);
+        subscriber.complete();
+      });
+    }
+
+    const query = `{ blockTraces(deployment_id: ${filter.deployment}, node_name: "${filter.name}") }`
+
+    return this.tracingGQL.query<any>('getTraces', query)
       .pipe(
         map((response: any) =>
           response.blockTraces.traces.reverse().map((trace: any) => ({
@@ -31,8 +42,8 @@ export class TracingBlocksService {
         ));
   }
 
-  getBlockTraceGroups(hash: string): Observable<TracingTraceGroup[]> {
-    return this.tracingGQL.query<any>('blockStructuredTrace', `{ blockStructuredTrace(block_identifier: "${hash}") }`)
+  getBlockTraceGroups(hash: string, filter: TracingBlockFilter): Observable<TracingTraceGroup[]> {
+    return this.tracingGQL.query<any>('blockStructuredTrace', `{ blockStructuredTrace(block_identifier: "${hash}", deployment_id: ${filter.deployment}, node_name: "${filter.name}") }`)
       .pipe(
         map((response: any) =>
           response.blockStructuredTrace.sections.map((group: any) => ({
@@ -54,5 +65,20 @@ export class TracingBlocksService {
       checkpoints: this.getCheckpoints(checkpoint),
     }));
   }
+
+
+    getDeployments(): Observable<number[]> {
+      return this.tracingGQL.query<any>('deployments', '{ deployments }').pipe(
+        map(response => response.deployments.map((d: any) => d)),
+      );
+    }
+  
+    getNodes(deploymentId: number): Observable<TracingBlockFilter[]> {
+      const query = `{ nodes(deployment_id: ${deploymentId}) }`
+      return this.tracingGQL.query<any>('nodes', query).pipe(
+        map(response => response.nodes.map((n: any) => n)),
+      );
+    }
+  
 }
 

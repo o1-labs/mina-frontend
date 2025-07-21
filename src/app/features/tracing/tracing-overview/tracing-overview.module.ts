@@ -7,6 +7,8 @@ import { TracingOverviewEffects } from '@tracing/tracing-overview/tracing-overvi
 import { TracingOverviewGraphListComponent } from './tracing-overview-graph-list/tracing-overview-graph-list.component';
 import { TracingOverviewToolbarComponent } from './tracing-overview-toolbar/tracing-overview-toolbar.component';
 import { FlameTimeGraphComponent } from '@shared/components/flame-time-graph/flame-time-graph/flame-time-graph.component';
+import { TracingOverviewFiltersComponent } from './tracing-overview-filters/tracing-overview-filters.component';
+import { HorizontalMenuComponent } from '@app/shared/components/horizontal-menu/horizontal-menu.component';
 
 
 @NgModule({
@@ -14,12 +16,14 @@ import { FlameTimeGraphComponent } from '@shared/components/flame-time-graph/fla
     TracingOverviewComponent,
     TracingOverviewGraphListComponent,
     TracingOverviewToolbarComponent,
+    TracingOverviewFiltersComponent,
   ],
   imports: [
     SharedModule,
     TracingOverviewRouting,
     EffectsModule.forFeature([TracingOverviewEffects]),
     FlameTimeGraphComponent,
+    HorizontalMenuComponent,
   ],
 })
 export class TracingOverviewModule {}

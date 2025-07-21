@@ -1,0 +1,80 @@
+<mina-horizontal-menu [template]="template" [clz]="'pl-12'"></mina-horizontal-menu>
+
+<ng-template #template>
+
+  <div class="fx-row-vert-cent ">
+    <div class="mr-16 tertiary">Filter</div>
+      <div class="fx-row-vert-cent flex-between w-100">
+        <div class="fx-row-vert-cent shrink-0">
+          <button class="h-sm fx-row-vert-cent flex-between mr-5"
+                  [ngClass]="'btn-primary'">
+            <div class="fx-row-vert-cent">
+              Select Deployment
+            </div>
+          </button>
+          <button class="h-sm fx-row-vert-cent flex-between mr-5"
+                #deploymentDropdownTrigger
+                [ngClass]="'btn-primary'"
+                (click)="openDeploymentDropdown($event)"
+                >
+            <div class="fx-row-vert-cent">
+            {{ filter.deployment === undefined || filter.deployment == maxDeploymentId() ? 'Current' : filter.deployment  }}
+              <span class="mina-icon" >arrow_drop_down</span>
+            </div>
+          </button>
+          <button class="h-sm fx-row-vert-cent flex-between mr-5"
+                  [ngClass]="'btn-primary'">
+            <div class="fx-row-vert-cent">
+              Select Node
+            </div>
+          </button>
+          <button class="h-sm fx-row-vert-cent flex-between mr-5"
+                #nodesDropdownTrigger
+                [ngClass]="'btn-primary'"
+                (click)="openNodesDropdown($event)"
+                >
+            <div class="fx-row-vert-cent">
+            {{ filter.name === undefined ? '' : filter.name  }}
+              <span class="mina-icon" >arrow_drop_down</span>
+            </div>
+          </button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #deploymentDropdown >
+  <div class="dropdown border-rad-4 popup-box-shadow-weak flex-column border bg-surface overflow-hidden"
+    (clickOutside)="detachDeploymentsSelector()">
+    <div class="overflow-auto h-100 p-10 monospace">
+      <div class="dropdown-item fx-row-vert-cent flex-between pointer pl-8 pr-8 border-rad-4 mb-5"
+          (click)="resetDeploymentsFilter()">
+      <span class="mina-icon f-20">check_small</span>
+      <span>Current</span>
+      </div>
+        <div *ngFor="let deployment of getDeployments(); let i=index"
+         class="dropdown-item fx-row-vert-cent flex-between pointer pl-8 pr-8 border-rad-4 mb-5"
+         (click)="filterDeployments(deployment)">
+          <span class="mina-icon f-20">check_small</span>
+          <span>{{ deployment }}</span>
+        </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #nodesDropdown>
+  <div class="dropdown border-rad-4 popup-box-shadow-weak flex-column border bg-surface overflow-hidden"
+   (clickOutside)="detachNodesSelector()">
+    <div class="overflow-auto h-100 w-300  p-10 monospace" style="width: 600px;" >
+        <div *ngFor="let node of getNodes(); let i=index"
+          class="dropdown-item"
+          (click)="filterNodes(node.name)">
+          <span class="mina-icon f-20">check_small</span>
+          <span style="width: 500px;">{{ node.name }}</span>
+        </div>
+    </div>
+  </div>
+</ng-template>
+
+
+

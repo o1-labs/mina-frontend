@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { MinaNode } from '@shared/types/core/environment/mina-env.type';
-import { getURL } from '@shared/constants/config';
+import { CONFIG, getURL } from '@shared/constants/config';
 import { catchError, map, Observable, throwError } from 'rxjs';
 
 
@@ -15,7 +15,7 @@ export class TracingGraphQlService {
   constructor(private http: HttpClient) { }
 
   changeGraphQlProvider(node: MinaNode): void {
-    this.url = getURL(node['tracing-graphql'] + '/graphql');
+    this.url = getURL(CONFIG.tracingEndpoint?.domain + ":" + CONFIG.tracingEndpoint?.port + '/graphql');
   }
 
   query<T>(queryName: string, query: string, variables?: { [key: string]: any }): Observable<T> {

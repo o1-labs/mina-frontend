@@ -5,13 +5,14 @@ import { getMergedRoute } from '@shared/router/router-state.selectors';
 import { MergedRoute } from '@shared/router/merged-route';
 import { filter } from 'rxjs';
 import { Routes } from '@shared/enums/routes.enum';
-import { selectTracingActiveTrace, selectTracingBlocksSorting, selectTracingTraces } from '@tracing/tracing-blocks/tracing-blocks.state';
-import { TracingBlocksSelectRow, TracingBlocksSort } from '@tracing/tracing-blocks/tracing-blocks.actions';
+import { selectTracingActiveTrace, selectTracingBlocksFilter, selectTracingBlocksSorting, selectTracingTraces } from '@tracing/tracing-blocks/tracing-blocks.state';
+import { TracingBlocksFilter, TracingBlocksSelectRow, TracingBlocksSort } from '@tracing/tracing-blocks/tracing-blocks.actions';
 import { SecDurationConfig } from '@shared/pipes/sec-duration.pipe';
 import { TableColumnList } from '@shared/types/shared/table-head-sorting.type';
 import { selectActiveNode } from '@app/app.state';
 import { MinaNode } from '@shared/types/core/environment/mina-env.type';
 import { MinaTableWrapper } from '@shared/base-classes/mina-table-wrapper.class';
+import { TracingBlockFilter } from '@app/shared/types/tracing/blocks/tracing-block-filter.type';
 
 const secDurationConfig: SecDurationConfig = {
   red: 50,
@@ -34,6 +35,7 @@ export class TracingBlocksTableComponent extends MinaTableWrapper<TracingBlockTr
   readonly origin: string = origin;
 
   activeNodeName: string;
+  filter: TracingBlockFilter;
 
   protected readonly tableHeads: TableColumnList<TracingBlockTrace> = [
     { name: 'height' },
@@ -58,6 +60,7 @@ export class TracingBlocksTableComponent extends MinaTableWrapper<TracingBlockTr
     this.listenToActiveTraceChange();
     this.listenToRouteChange();
     this.listenToActiveNodeChange();
+    this.listenToFilterChanges();
   }
 
   protected override setupTable(): void {
@@ -77,7 +80,7 @@ export class TracingBlocksTableComponent extends MinaTableWrapper<TracingBlockTr
   protected override onRowClick(trace: TracingBlockTrace): void {
     if (this.activeTrace?.hash !== trace.hash) {
       this.router.navigate([Routes.TRACING, Routes.BLOCKS, trace.hash], { queryParamsHandling: 'merge' });
-      this.dispatch(TracingBlocksSelectRow, trace);
+      this.dispatch(TracingBlocksSelectRow, { trace, filter: this.filter });
     }
   }
 
@@ -96,7 +99,10 @@ export class TracingBlocksTableComponent extends MinaTableWrapper<TracingBlockTr
       this.table.rows = traces;
       this.table.detect();
       if (this.preselect) {
-        this.dispatch(TracingBlocksSelectRow, this.traces.find(t => t.hash === this.hashFromRoute));
+        this.dispatch(TracingBlocksSelectRow, {
+          trace: this.traces.find(t => t.hash === this.hashFromRoute),
+          filter: this.filter,
+        });
         this.preselect = false;
         this.detect();
         this.scrollToElement();
@@ -121,4 +127,11 @@ export class TracingBlocksTableComponent extends MinaTableWrapper<TracingBlockTr
       this.detect();
     }, filter(trace => trace !== this.activeTrace));
   }
+
+    private listenToFilterChanges(): void {
+      this.select(selectTracingBlocksFilter, (filter: TracingBlockFilter) => {
+        this.filter = filter;
+        this.detect();
+      });
+    }
 }

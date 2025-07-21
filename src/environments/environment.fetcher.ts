@@ -5,27 +5,18 @@ export const environment: Readonly<MinaEnv> = {
   identifier: 'fetcher',
   // aggregator: 'http://1.k8.openmina.com:31308/aggregator',
   nodeLister: {
-    domain: FETCHER_HOST, // Will be replaced by Webpack DefinePlugin
-    port: Number(FETCHER_PORT), // Will be replaced by Webpack DefinePlugin
+    domain: "http://65.21.209.217", // Will be replaced by Webpack DefinePlugin
+    port: 4000, // Will be replaced by Webpack DefinePlugin
+  },
+  tracingEndpoint: {
+    domain: 'http://65.21.209.217',
+    port: 9080,
   },
   isVanilla: false,
   globalConfig: {
     features: {
       dashboard: ['nodes', 'topology'],
-      explorer: [
-        'blocks',
-        'transactions',
-        'snark-pool',
-        'scan-state',
-        'snark-traces',
-      ],
-      resources: ['system'],
-      network: ['messages', 'connections', 'blocks', 'blocks-ipc'],
       tracing: ['overview', 'blocks'],
-      benchmarks: ['wallets', 'transactions'],
-      storage: ['accounts'],
-      'snark-worker': ['dashboard', 'actions'],
-      'web-node': ['wallet', 'peers', 'logs', 'state'],
       experiments: [],
     },
   },
