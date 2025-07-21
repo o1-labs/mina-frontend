@@ -24,8 +24,6 @@ import { SubmenuTabsComponent } from './layout/submenu-tabs/submenu-tabs.compone
 import { NodePickerComponent } from './layout/node-picker/node-picker.component';
 import { GlobalErrorHandlerService } from '@core/services/global-error-handler.service';
 import { Router } from '@angular/router';
-import { AngularFireModule } from '@angular/fire/compat';
-import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
 import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
 import localeEn from '@angular/common/locales/en';
@@ -66,8 +64,6 @@ export class AppGlobalErrorhandler implements ErrorHandler {
     BrowserModule,
     BrowserAnimationsModule,
     AppRouting,
-    CONFIG.firebase ? AngularFireModule.initializeApp(CONFIG.firebase) : [],
-    CONFIG.firebase ? AngularFireAnalyticsModule : [],
     StoreModule.forRoot(reducers, {
       metaReducers,
       runtimeChecks: {
