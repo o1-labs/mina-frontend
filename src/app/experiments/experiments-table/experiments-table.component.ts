@@ -216,21 +216,29 @@ export class ExperimentsTableComponent
     return count;
   }
 
+  private lastGroupedView: Experiment[] | null = null;
+  private lastInputData: Experiment[] | null = null;
+
   private createGroupedView(experimentsToGroup?: Experiment[]): Experiment[] {
     const experiments = experimentsToGroup || this.experiments;
+
+    // Check if input data has changed
+    if (this.lastInputData === experiments) {
+      return this.lastGroupedView!;
+    }
+
     const grouped: Experiment[] = [];
     const experimentGroups = new Map<string, Experiment[]>();
     
     // Group experiments by name
-    experiments.forEach(exp => {
-      if (!experimentGroups.has(exp.exp)) {
-        experimentGroups.set(exp.exp, []);
-      }
-      experimentGroups.get(exp.exp)!.push(exp);
-    });
+    for (const exp of experiments) {
+      const group = experimentGroups.get(exp.exp) || [];
+      group.push(exp);
+      experimentGroups.set(exp.exp, group);
+    }
     
     // Create grouped view
-    experimentGroups.forEach((rounds, expName) => {
+    for (const [expName, rounds] of experimentGroups) {
       // Sort rounds
       rounds.sort((a, b) => a.round - b.round);
       
