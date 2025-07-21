@@ -98,8 +98,8 @@ export class ExperimentsTableComponent
     this.listenToExperimentsChanges();
     this.listenToSortingChanges();
     this.listenToFilterChanges();
-    this.listenToRouteChange();
     this.listenToActiveExperimentChange();
+    this.listenToRouteChange();
   }
 
   private listenToExperimentsChanges(): void {
