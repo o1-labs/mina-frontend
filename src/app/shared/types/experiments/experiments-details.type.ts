@@ -7,7 +7,7 @@ export interface ExperimentDetails {
     status: string;
     comment: string;
     setup_json: any;
-    current_step_no: number
+    current_step_no: number;
     current_step_name: string;
     warnings: string[];
     errors: string[];
