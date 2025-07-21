@@ -157,24 +157,24 @@ export class TracingBlocksFiltersComponent extends ManualDetection implements On
 
 
   resetDeploymentsFilter(): void {
-    const maxDeployment = Math.max(...this.deployments);
+    const maxDeploymentId = this.maxDeploymentId();
     this.store.dispatch({
       type: TRACING_BLOCKS_FILTER,
       payload: {
       ...this.filter,
-      deployment: maxDeployment,
+      deployment: maxDeploymentId,
       } as TracingBlockFilter,
     });
     this.nodes = [];
     this.store.dispatch({
       type: TRACING_BLOCKS_GET_NODES,
-      payload: maxDeployment,
+      payload: maxDeploymentId,
     });
     this.deploymentSelectorOverlay.detach();
     this.store.dispatch({
       type: TRACING_BLOCKS_GET_TRACES,
       payload: {
-        deployment: maxDeployment,
+        deployment: maxDeploymentId,
       },
     });
     this.deploymentSelectorOverlay.detach();
@@ -213,14 +213,11 @@ export class TracingBlocksFiltersComponent extends ManualDetection implements On
     this.nodesSelectorOverlay.detach();
   }
 
-  maxDeployment(): number {
-    return Math.max(...this.deployments);
-  }
 
   // Filter out the max deployment from the list of deployments
   // to avoid showing it in the dropdown as we have special entry 'Current' for this
   getDeployments(): number[] {
-    return Array.from(this.deployments).filter(deployment => deployment !== this.maxDeployment());
+    return Array.from(this.deployments).filter(deployment => deployment !== this.maxDeploymentId());
   }
 
   getNodes(): TracingBlockFilter[] {

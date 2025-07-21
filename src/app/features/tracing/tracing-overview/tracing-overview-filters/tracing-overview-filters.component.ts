@@ -140,19 +140,19 @@ export class TracingOverviewFiltersComponent extends ManualDetection implements 
   }
 
   setMaxDeploymentsFilter(): void {
-    const maxDeployment = this.maxDeploymentId();
+    const maxDeploymentId = this.maxDeploymentId();
     this.store.dispatch({
       type: TRACING_OVERVIEW_FILTER,
       payload: {
         ...this.filter,
-        deployment: maxDeployment,
+        deployment: maxDeploymentId,
       } as TracingOverviewCheckpointFilter,
     });
     this.nodes = [];
     this.deploymentSelectorOverlay.detach();
     this.store.dispatch({
       type: TRACING_OVERVIEW_GET_NODES,
-      payload: maxDeployment,
+      payload: maxDeploymentId,
     });
     this.deploymentSelectorOverlay.detach();
   }
