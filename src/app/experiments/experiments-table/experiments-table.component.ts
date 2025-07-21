@@ -69,7 +69,7 @@ export class ExperimentsTableComponent
 
   private listenToExperimentsChanges(): void {
     this.select(selectExperimentsData, (experiments: Experiment[]) => {
-      this.experiments = experiments
+      this.experiments = experiments;
       this.table.rows = this.experiments;
       this.table.detect();
     });
