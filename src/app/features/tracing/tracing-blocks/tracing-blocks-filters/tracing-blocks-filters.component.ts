@@ -213,7 +213,6 @@ export class TracingBlocksFiltersComponent extends ManualDetection implements On
     this.nodesSelectorOverlay.detach();
   }
 
-
   // Filter out the max deployment from the list of deployments
   // to avoid showing it in the dropdown as we have special entry 'Current' for this
   getDeployments(): number[] {

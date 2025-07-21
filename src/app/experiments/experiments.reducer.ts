@@ -7,6 +7,9 @@ EXPERIMENTS_GET_SUCCESS,
 EXPERIMENTS_SORT,
 EXPERIMENTS_FILTER,
 EXPERIMENTS_CLOSE,
+EXPERIMENTS_SELECT_ROW,
+EXPERIMENTS_GET_DETAILS,
+EXPERIMENTS_GET_DETAILS_SUCCESS,
 ExperimentsActions
 } from './experiments.actions';
 import { Experiment } from '@app/shared/types/experiments/experiments.type';
@@ -19,6 +22,8 @@ const initialState: ExperimentsState = {
     sortDirection: SortDirection.ASC,
   },
   isLoading: false,
+  isLoadingDetails: false,
+  activeExperiment: undefined,
   filter: {
     deployment: undefined,
     experiment: undefined,
@@ -73,8 +78,35 @@ export function reducer(state: ExperimentsState = initialState, action: Experime
       }
     }
 
-    case EXPERIMENTS_CLOSE:
-      return initialState;
+    case EXPERIMENTS_SELECT_ROW: {
+      return {
+        ...state,
+        activeExperiment: action.payload?.experiment as any, // Convert to ExperimentDetails
+        isLoadingDetails: !!action.payload, // Start loading if experiment is selected
+      };
+    }
+
+    case EXPERIMENTS_GET_DETAILS: {
+      return {
+        ...state,
+        isLoadingDetails: true,
+      };
+    }
+
+    case EXPERIMENTS_GET_DETAILS_SUCCESS: {
+      return {
+        ...state,
+        activeExperiment: action.payload as any,
+        isLoadingDetails: false,
+      };
+    }
+
+    case EXPERIMENTS_CLOSE: {
+      return {
+        ...initialState,
+        isLoadingDetails: false,
+      };
+    }
 
     default:
       return state;

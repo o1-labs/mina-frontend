@@ -3,12 +3,15 @@ import { MinaState } from '@app/app.setup';
 import { TableSort } from '@shared/types/shared/table-sort.type';
 import { ExperimentsFilter } from '@shared/types/experiments/experiments-filters.type';
 import { Experiment } from '@app/shared/types/experiments/experiments.type';
+import { ExperimentDetails } from '@app/shared/types/experiments/experiments-details.type';
 
 export interface ExperimentsState {
   filter: ExperimentsFilter;
   sort: TableSort<Experiment>;
   data: Experiment[];
+  activeExperiment: ExperimentDetails;
   isLoading: boolean;
+  isLoadingDetails: boolean;
 }
 
 const select = <T>(selector: (state: ExperimentsState) => T): MemoizedSelector<MinaState, T> => createSelector(
@@ -22,3 +25,5 @@ export const selectExperimentsData = select((state: ExperimentsState): Experimen
 export const selectExperimentFilter = select(((state: ExperimentsState): ExperimentsFilter => state.filter));
 export const selectExperimentSort = select(((state: ExperimentsState): TableSort<Experiment> => state.sort));
 export const selectExperimentLoad = select(((state: ExperimentsState): boolean => state.isLoading));
+export const selectExperimentDetails = select(((state: ExperimentsState): ExperimentDetails => state.activeExperiment));
+export const selectExperimentDetailsLoading = select(((state: ExperimentsState): boolean => state.isLoadingDetails));

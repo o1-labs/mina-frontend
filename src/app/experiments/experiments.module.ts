@@ -11,12 +11,15 @@ import { HorizontalMenuComponent } from '@shared/components/horizontal-menu/hori
 import { HorizontalResizableContainerComponent } from '@shared/components/horizontal-resizable-container/horizontal-resizable-container.component';
 import { EffectsModule } from '@ngrx/effects';
 import { ExperimentsEffects } from './experiments.effects';
+import { ExperimentsSidePanelComponent } from './experiments-side-panel/experiments-side-panel.component';
+import { MinaJsonViewerComponent } from '@shared/components/mina-json-viewer/mina-json-viewer.component';
 
 @NgModule({
   declarations: [
     ExperimentsComponent,
     ExperimentsTableComponent,
     ExperimentsToolbarComponent,
+    ExperimentsSidePanelComponent
   ],
   imports: [
     CommonModule,
@@ -27,6 +30,7 @@ import { ExperimentsEffects } from './experiments.effects';
     HorizontalMenuComponent,
     EffectsModule.forFeature([ExperimentsEffects]),
     HorizontalResizableContainerComponent,
+    MinaJsonViewerComponent,
   ],
 })
 export class ExperimentsModule {}

@@ -1,2 +1,16 @@
-<mina-experiments-toolbar></mina-experiments-toolbar>
-<mina-experiments-table ></mina-experiments-table>
+<mina-horizontal-resizable-container *ngIf="el" [leftTemplate]="left"
+                                     [rightTemplate]="right"
+                                     [show]="isActiveExperiment"
+                                     [minWidth]="420"
+                                     [maxWidthElement]="el.nativeElement"
+                                     localStorageKey="experiments-side-panel-width">
+</mina-horizontal-resizable-container>
+
+<ng-template #left>
+  <mina-experiments-toolbar></mina-experiments-toolbar>
+  <mina-experiments-table></mina-experiments-table>
+</ng-template>
+
+<ng-template #right>
+  <mina-experiments-side-panel></mina-experiments-side-panel>
+</ng-template>
