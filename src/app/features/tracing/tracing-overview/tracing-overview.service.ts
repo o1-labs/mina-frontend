@@ -19,7 +19,7 @@ export class TracingOverviewService {
   }
 
   getNodes(deploymentId: number): Observable<TracingOverviewCheckpointFilter[]> {
-    let query = `{ nodes(deployment_id: ${deploymentId}) }`
+    const query = `{ nodes(deployment_id: ${deploymentId}) }`
     return this.tracingGQL.query<any>('nodes', query).pipe(
       map(response => response.nodes.map((n: any) => n)),
     );

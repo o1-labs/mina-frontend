@@ -74,7 +74,7 @@ export class TracingBlocksService {
     }
   
     getNodes(deploymentId: number): Observable<TracingBlockFilter[]> {
-      let query = `{ nodes(deployment_id: ${deploymentId}) }`
+      const query = `{ nodes(deployment_id: ${deploymentId}) }`
       return this.tracingGQL.query<any>('nodes', query).pipe(
         map(response => response.nodes.map((n: any) => n)),
       );

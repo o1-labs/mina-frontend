@@ -103,7 +103,7 @@ export class ExperimentsToolbarComponent extends ManualDetection implements OnIn
     this.deploymentSelectorOverlay = this.openDropdown(event, this.deploymentDrTemplate, this.deploymentDropdownTrigger, this.deploymentSelectorOverlay)
   }
   
-  openDropdown(event: MouseEvent,drTemplate: TemplateRef<void>, dropdownTrigger: ElementRef<HTMLDivElement>, selectorOverlay: OverlayRef): OverlayRef {
+  openDropdown(event: MouseEvent, drTemplate: TemplateRef<void>, dropdownTrigger: ElementRef<HTMLDivElement>, selectorOverlay: OverlayRef): OverlayRef {
     if (selectorOverlay?.hasAttached()) {
       selectorOverlay.detach();
       return selectorOverlay;
