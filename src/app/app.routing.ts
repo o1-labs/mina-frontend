@@ -81,11 +81,6 @@ const routes: Routes = [
     canActivate: [FeatureGuard],
   },
   {
-    path: 'zk-app',
-    loadChildren: () =>
-      import('./features/zk-app/zk-app.module').then((m) => m.ZkAppModule),
-  },
-  {
     path: 'experiments',
     loadChildren: () =>
       import('./experiments/experiments.module').then(
