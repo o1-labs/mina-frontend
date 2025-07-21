@@ -1,0 +1,127 @@
+<mina-horizontal-menu [template]="template" [clz]="'pl-12'"></mina-horizontal-menu>
+
+<ng-template #template>
+  <div class="fx-row-vert-cent flex-between w-100">
+    <div class="fx-row-vert-cent shrink-0">
+      <button class="h-sm fx-row-vert-cent flex-between mr-5"
+      [ngClass]="'btn-primary'">
+      <div class="fx-row-vert-cent">
+      Deployments
+      </div>
+      </button>
+      <button class="h-sm fx-row-vert-cent flex-between mr-5"
+              #deploymentDropdownTrigger
+              [ngClass]="'btn-primary'"
+              (click)="openDeploymentDropdown($event)"
+              >
+        <div class="fx-row-vert-cent">
+        {{ filter.deployment === undefined ? 'All' : filter.deployment  }}
+        <span class="mina-icon" >arrow_drop_down</span>
+        </div>
+      </button>
+      <button class="h-sm fx-row-vert-cent flex-between mr-5"
+      [ngClass]="'btn-primary'">
+      <div class="fx-row-vert-cent">
+      Experiments
+      </div>
+      </button>
+      <button class="h-sm fx-row-vert-cent flex-between mr-5"
+              #experimentsDropdownTrigger
+              [ngClass]="'btn-primary'"
+              (click)="openExperimentsDropdown($event)"
+              >
+        <div class="fx-row-vert-cent">
+        {{ filter.experiment === undefined ? 'All' : filter.experiment  }}
+        <span class="mina-icon" >arrow_drop_down</span>
+        </div>
+      </button>
+      <button class="h-sm fx-row-vert-cent flex-between mr-5"
+      [ngClass]="'btn-primary'">
+      <div class="fx-row-vert-cent">
+      Rounds
+      </div>
+      </button>
+      <button class="h-sm fx-row-vert-cent flex-between mr-5"
+              #roundsDropdownTrigger
+              [ngClass]="'btn-primary'"
+              (click)="openRoundsDropdown($event)">
+        <div class="fx-row-vert-cent">
+        {{ filter.round === undefined ? 'All' : filter.round  }}
+        <span class="mina-icon" >arrow_drop_down</span>
+        </div>
+      </button>
+      
+    </div>
+
+    <div class="fx-row-vert-cent">
+      <div class="tertiary pr-12 shrink-0"> {{ experiments ? experiments.length : 0 }}</div>
+      <button class="btn-primary flex-row align-center mr-10 pl-8 f-base"
+        (click)="refreshData()"
+        [disabled]="isLoading"
+      >
+      <span class="icon-container fx-row-vert-cent">
+        <span *ngIf="!isLoading">Refresh</span>
+        <span *ngIf="isLoading">Loading...</span>
+      </span>
+      <span class="mina-icon icon-200 f-20 ml-5 tertiary">cached</span>
+      </button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #deploymentDropdown >
+  <div class="dropdown border-rad-4 popup-box-shadow-weak flex-column border bg-surface overflow-hidden"
+    (clickOutside)="detachDeploymentsSelector()">
+    <div class="overflow-auto h-100 p-10 monospace">
+      <div class="dropdown-item fx-row-vert-cent flex-between pointer pl-8 pr-8 border-rad-4 mb-5"
+          (click)="resetDeploymentsFilter()">
+      <span class="mina-icon f-20">check_small</span>
+      <span>All</span>
+      </div>
+        <div *ngFor="let deployment of getDeployments(); let i=index"
+            class="dropdown-item fx-row-vert-cent flex-between pointer pl-8 pr-8 border-rad-4 mb-5"
+            (click)="filterDeployments(deployment)">
+          <span class="mina-icon f-20">check_small</span>
+          <span>{{ deployment }}</span>
+        </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #experimentsDropdown >
+  <div class="dropdown border-rad-4 popup-box-shadow-weak flex-column border bg-surface overflow-hidden"
+    (clickOutside)="detachExperimentsSelector()">
+    <div class="overflow-auto h-100 p-10 monospace">
+      <div class="dropdown-item fx-row-vert-cent flex-between pointer pl-8 pr-8 border-rad-4 mb-5"
+          (click)="resetExperimentsFilter()">
+      <span class="mina-icon f-20">check_small</span>
+      <span>All</span>
+      </div>
+      <div *ngFor="let experiment of getExperimentsNames(); let i=index"
+           class="dropdown-item fx-row-vert-cent flex-between pointer pl-8 pr-8 border-rad-4 mb-5"
+           (click)="filterExperiments(experiment)">
+        <span class="mina-icon f-20">check_small</span>
+        <span>{{ experiment }}</span>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #roundsDropdown >
+  <div class="dropdown border-rad-4 popup-box-shadow-weak flex-column border bg-surface overflow-hidden"
+    (clickOutside)="detachRoundsSelector()">
+    <div class="overflow-auto h-100 p-10 monospace">
+      <div class="dropdown-item fx-row-vert-cent flex-between pointer pl-8 pr-8 border-rad-4 mb-5"
+          (click)="resetRoundsFilter()">
+      <span class="mina-icon f-20">check_small</span>
+      <span>All</span>
+      </div>
+      <div *ngFor="let round of getRounds(); let i=index"
+           class="dropdown-item fx-row-vert-cent flex-between pointer pl-8 pr-8 border-rad-4 mb-5"
+           (click)="filterRounds(round)">
+        <span class="mina-icon f-20">check_small</span>
+        <span>{{ round }}</span>
+      </div>
+    </div>
+  </div>
+</ng-template>

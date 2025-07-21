@@ -1,0 +1,54 @@
+@import 'variables';
+
+.loading-container {
+  margin: 10px
+}
+
+.error-container {
+  margin: 10px
+}
+
+.refresh-button {
+  margin: 10px
+}
+
+.icon-display {
+  transform: scale(0.8);
+}
+
+.icon-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.successful {
+	color: $success-secondary;
+}
+
+.missed {
+	color: $aware-secondary;
+}
+
+.failed {
+	color: $warn-primary;
+}
+
+.text-align-left {
+  text-align: left;
+}
+
+.text-align-right {
+  text-align: right;
+}
+
+.bold-text {
+  font-weight: bold;
+}
+
+@media (min-width: 701px) {
+  .desktop-container {
+    overflow: scroll;
+    padding-bottom: 30px;
+  }
+}
