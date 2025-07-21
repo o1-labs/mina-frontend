@@ -3,7 +3,11 @@ name: Build and Test Frontend
 on:
   push:
     branches:
-      - local
+      - main
+      - dkijania/**
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
