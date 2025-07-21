@@ -58,7 +58,7 @@ export class FlameTimeGraphComponent extends ManualDetection {
 
   onColumnHover(column: FlameTimeGraphColumn): void {
     if (!this.tooltipComponent) {
-      return
+      return;
     }
     
     this.hoveredColumn = column;
