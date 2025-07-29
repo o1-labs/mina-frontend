@@ -262,7 +262,7 @@ export class ExperimentsTableComponent
           __isSummary: true
         } as any);
       }
-    });
+    }
     
     return grouped;
   }
