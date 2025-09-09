@@ -7,7 +7,7 @@ import { ExperimentDetails } from '@app/shared/types/experiments/experiments-det
   providedIn: 'root',
 })
 export class ExperimentsService {
-  private readonly apiUrl = "EXPERIMENTS_BACKEND_API_ENDPOINT"; // Will be replaced by Webpack DefinePlugin
+  private readonly apiUrl = EXPERIMENTS_BACKEND_API_ENDPOINT; // Will be replaced by Webpack DefinePlugin
 
   constructor(private readonly http: HttpClient) {}
 
