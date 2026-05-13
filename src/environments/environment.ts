@@ -4,12 +4,12 @@ export const environment: Readonly<MinaEnv> = {
   production: false,
   identifier: 'local',
   nodeLister: {
-    domain: 'http://log-fetcher.orchestrator-compose',
-    port: 4000,
+    domain: 'https://orchestrator-log-fetcher-2.gcp.o1test.net',
+    port: 443,
   },
   tracingEndpoint: {
-    domain: 'http://log-api.orchestrator-compose',
-    port: 9080,
+    domain: 'https://orchestrator-log-api-2.gcp.o1test.net',
+    port: 443,
   },
   isVanilla: true,
   globalConfig: {

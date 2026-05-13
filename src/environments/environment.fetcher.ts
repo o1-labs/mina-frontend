@@ -5,12 +5,12 @@ export const environment: Readonly<MinaEnv> = {
   identifier: 'fetcher',
   // aggregator: 'http://1.k8.openmina.com:31308/aggregator',
   nodeLister: {
-    domain: "http://log-fetcher.orchestrator-compose", // Will be replaced by Webpack DefinePlugin
-    port: 4000, // Will be replaced by Webpack DefinePlugin
+    domain: "https://orchestrator-log-fetcher-2.gcp.o1test.net", // Will be replaced by Webpack DefinePlugin
+    port: 443, // Will be replaced by Webpack DefinePlugin
   },
   tracingEndpoint: {
-    domain: 'http://log-api.orchestrator-compose',
-    port: 9080,
+    domain: 'https://orchestrator-log-api-2.gcp.o1test.net',
+    port: 443,
   },
   isVanilla: false,
   globalConfig: {
