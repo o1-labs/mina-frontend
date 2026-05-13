@@ -4,13 +4,13 @@ export const environment: Readonly<MinaEnv> = {
   production: false,
   identifier: 'local',
   nodeLister: {
-    domain: 'http://65.21.209.217',
+    domain: 'http://log-fetcher.orchestrator-compose',
     port: 4000,
   },
   tracingEndpoint: {
-    domain: 'http://65.21.209.217',
+    domain: 'http://log-api.orchestrator-compose',
     port: 9080,
-  },  
+  },
   isVanilla: true,
   globalConfig: {
     features: {

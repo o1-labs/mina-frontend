@@ -1,11 +1,11 @@
 FROM node:22-alpine AS build_image
 WORKDIR /app
-ARG FETCHER_HOST=http://65.21.209.217
+ARG FETCHER_HOST=http://log-fetcher.orchestrator-compose
 ARG FETCHER_PORT=4000
 ARG APP_CONFIG=fetcher
 ENV FETCHER_HOST=${FETCHER_HOST}
 ENV FETCHER_PORT=${FETCHER_PORT}
-ENV EXPERIMENTS_BACKEND_API_ENDPOINT=${FETCHER_HOST}:3003/api/experiments
+ENV EXPERIMENTS_BACKEND_API_ENDPOINT=http://experiments-api.orchestrator-compose:3003/api/experiments
 COPY . .
 RUN npm install \
   && node --max-old-space-size=4096 node_modules/.bin/ng build --configuration ${APP_CONFIG} \
