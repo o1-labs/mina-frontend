@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
-import { GraphQLService } from '@core/services/graph-ql.service';
+import { MinaSdkService } from '@core/services/mina-sdk.service';
 import { ExplorerSnark } from '@shared/types/explorer/snarks/explorer-snarks.type';
 
 @Injectable({
@@ -8,22 +8,16 @@ import { ExplorerSnark } from '@shared/types/explorer/snarks/explorer-snarks.typ
 })
 export class ExplorerSnarksService {
 
-  constructor(private graphQL: GraphQLService) { }
+  constructor(private sdk: MinaSdkService) { }
 
   getSnarks(): Observable<ExplorerSnark[]> {
-    return this.graphQL.query('snarkPool',`{
-        snarkPool {
-          workIds
-          prover
-          fee
-        }
-      }`)
+    return this.sdk.call(client => client.getSnarkPool())
       .pipe(
-        map((data: any) => data.snarkPool
-          .map((sn: any) => ({
-            fee: sn.fee,
-            prover: sn.prover,
-            workIds: sn.workIds.join(', '),
+        map(works => works
+          .map(work => ({
+            fee: work.fee.toNanominaString(),
+            prover: work.prover,
+            workIds: work.workIds.join(', '),
           } as ExplorerSnark)),
         ),
       );

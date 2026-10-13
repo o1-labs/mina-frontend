@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { GraphQLService } from '@core/services/graph-ql.service';
+import { MinaSdkService } from '@core/services/mina-sdk.service';
 import { CONFIG } from '@shared/constants/config';
 import { MinaNode } from '@shared/types/core/environment/mina-env.type';
 import {
@@ -20,7 +20,7 @@ import {
   providedIn: 'root',
 })
 export class AppService {
-  constructor(private graphQL: GraphQLService, private http: HttpClient) {}
+  constructor(private sdk: MinaSdkService, private http: HttpClient) {}
 
   getActiveNode(nodes: MinaNode[]): Observable<MinaNode | null> {
     if (CONFIG.nodeLister) {
@@ -38,12 +38,9 @@ export class AppService {
 
     return from(
       configs.map((node) =>
-        this.http
-          .post(
-            node.graphql + '/graphql',
-            { query: latestBlockHeight },
-            { headers: { 'Content-Type': 'application/json' } }
-          )
+        // A node is online when it answers a best-chain query.
+        this.sdk
+          .callOn(node.graphql + '/graphql', (client) => client.getBestChain(1))
           .pipe(
             map(() => node),
             switchMap(() => {
@@ -96,15 +93,3 @@ export class AppService {
     return of(CONFIG.configs);
   }
 }
-
-const latestBlockHeight = `
-  query latestBlockHeight {
-    bestChain(maxLength: 1) {
-      protocolState {
-        consensusState {
-          blockchainLength
-        }
-      }
-    }
-  }
-`;

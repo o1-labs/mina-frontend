@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { DaemonMetrics, DaemonStatus } from '@o1-labs/mina-sdk';
+import { MinaSdkService } from '@core/services/mina-sdk.service';
 import { DashboardNode } from '@shared/types/dashboard/node-list/dashboard-node.type';
 import { catchError, concatAll, EMPTY, filter, from, map, mergeMap, Observable, of, scan, switchMap, take, throwError, toArray } from 'rxjs';
 import { toReadableDate } from '@shared/helpers/date.helper';
@@ -20,7 +22,8 @@ export class DashboardNodesService {
   // readonly API = 'http://116.202.128.230:8000'; // aggregator
   private readonly options = { headers: { 'Content-Type': 'application/json' } };
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient,
+              private sdk: MinaSdkService) { }
 
   getNodes(): Observable<DashboardNode[]> {
     const name = (node: string) => {
@@ -82,10 +85,10 @@ export class DashboardNodesService {
     }
     return from(
       nodes.map(node =>
-        this.http
-          .post(node.url, { query: latestGlobalSlot }, this.options)
+        this.sdk
+          .callOn(node.url, client => client.getBestChain(1))
           .pipe(
-            map((response: any) => Number(lastItem(response.data.bestChain).protocolState.consensusState.slotSinceGenesis)),
+            map(blocks => lastItem(blocks).globalSlotSinceGenesis),
             catchError(() => EMPTY),
           ),
       ),
@@ -97,12 +100,19 @@ export class DashboardNodesService {
   }
 
   getNode(node: DashboardNode, globalSlot: number): Observable<DashboardNode[]> {
-    const body = { query: isNotVanilla() ? syncQuery : syncQueryVanilla };
-    return (CONFIG.nodeLister
+    // The daemon's status and metrics; a vanilla daemon has the status only.
+    const sync$: Observable<NodeSync | null> = CONFIG.nodeLister
       ? of(null)
-      : this.http.post(node.url, body, this.options))
+      : this.sdk.callOn(node.url, async client => {
+        const [daemon, metrics] = await Promise.all([
+          client.getDaemonStatus(),
+          isNotVanilla() ? client.getDaemonMetrics() : Promise.resolve(null),
+        ]);
+        return { daemon, metrics };
+      });
+    return sync$
       .pipe(
-        switchMap((syncResponse: any) =>
+        switchMap((syncResponse: NodeSync | null) =>
           this.http.post(node.tracingUrl, { query: tracingQuery(globalSlot) }, this.options).pipe(
             map((tracingResponse: any) => ({ syncResponse, tracingResponse })),
             catchError(() => {
@@ -112,9 +122,9 @@ export class DashboardNodesService {
             }),
           ),
         ),
-        map(({ syncResponse, tracingResponse }: { syncResponse: any, tracingResponse: any }) => {
-          const daemon = syncResponse?.data.daemonStatus || { syncStatus: AppNodeStatusTypes.SYNCED };
-          const metrics = syncResponse?.data.daemonStatus.metrics || {};
+        map(({ syncResponse, tracingResponse }: { syncResponse: NodeSync | null, tracingResponse: any }) => {
+          const daemon: Partial<DaemonStatus> = syncResponse?.daemon || { syncStatus: AppNodeStatusTypes.SYNCED };
+          const metrics: Partial<DaemonMetrics> = syncResponse?.metrics || {};
           let blockTraces = tracingResponse.data.blockTraces.traces;
           blockTraces = blockTraces.length ? blockTraces : [{}];
           const map1 = blockTraces.map((trace: any) => ({
@@ -194,11 +204,11 @@ export class DashboardNodesService {
 
     return from(
       uniqueNodes.map(node =>
-        this.http
-          .post<{ data: BestChainResponse }>(node.url, { query: bestChain() }, this.options)
+        this.sdk
+          .callOn(node.url, client => client.getBestChain(10))
           .pipe(
-            map(({ data }: { data: BestChainResponse }) => {
-              const chains = data.bestChain.filter(c => Number(c.protocolState.consensusState.blockHeight) <= node.blockchainLength);
+            map(blocks => {
+              const chains = toBestChain(blocks).filter(c => Number(c.protocolState.consensusState.blockHeight) <= node.blockchainLength);
               return ({
                 chains: chains,
                 node,
@@ -263,11 +273,11 @@ export class DashboardNodesService {
 
   private getDeepForks(chains: BestChain[], node: DashboardNode, maxLength: number): Observable<{ chains: BestChain[], node: DashboardNode }> {
     if (chains.length === 0) {
-      return this.http
-        .post<{ data: BestChainResponse }>(node.url, { query: bestChain(maxLength) }, this.options)
+      return this.sdk
+        .callOn(node.url, client => client.getBestChain(maxLength))
         .pipe(
-          map(({ data }: { data: BestChainResponse }) => {
-            const chains = data.bestChain.filter(c => Number(c.protocolState.consensusState.blockHeight) <= node.blockchainLength);
+          map(blocks => {
+            const chains = toBestChain(blocks).filter(c => Number(c.protocolState.consensusState.blockHeight) <= node.blockchainLength);
             return ({
               chains: chains,
               node,
@@ -279,11 +289,11 @@ export class DashboardNodesService {
     }
   }
 
-  private buildNodeFromErrorResponse(error: { data?: any }, node: DashboardNode): Observable<DashboardNode[]> {
-    const daemon = error.data?.data.daemonStatus;
+  private buildNodeFromErrorResponse(error: { data?: NodeSync | null }, node: DashboardNode): Observable<DashboardNode[]> {
+    const daemon = error.data?.daemon;
     const status = daemon?.syncStatus ?? AppNodeStatusTypes.OFFLINE;
-    const addr = daemon ? (daemon.addrsAndPorts.externalIp + ':' + daemon.addrsAndPorts.clientPort) : undefined;
-    const metrics = daemon?.metrics;
+    const addr = daemon?.addrsAndPorts ? (daemon.addrsAndPorts.externalIp + ':' + daemon.addrsAndPorts.clientPort) : undefined;
+    const metrics = error.data?.metrics;
     return of([{
       ...node,
       status,
@@ -362,85 +372,27 @@ export class DashboardNodesService {
     }*/
 }
 
-const syncQuery = `
-  query status {
-    daemonStatus {
-      blockchainLength
-      addrsAndPorts {
-        bindIp
-        clientPort
-        externalIp
-        libp2pPort
-      }
-      syncStatus
-      metrics {
-        transactionPoolSize
-        transactionsAddedToPool
-        transactionPoolDiffBroadcasted
-        transactionPoolDiffReceived
-        snarkPoolDiffBroadcasted
-        snarkPoolDiffReceived
-        snarkPoolSize
-        pendingSnarkWork
-      }
-    }
-  }
-`;
-
 const tracingQuery = (height: number) => `
   query traces { blockTraces(global_slot: ${height}) }
 `;
 
-const syncQueryVanilla = `
-  query status {
-    daemonStatus {
-      blockchainLength
-      globalSlotSinceGenesisBestTip
-      addrsAndPorts {
-        bindIp
-        clientPort
-        externalIp
-        libp2pPort
-      }
-      syncStatus
-      metrics {
-        transactionPoolSize
-        transactionsAddedToPool
-      }
-    }
-  }
-`;
-
-const latestGlobalSlot = `
-  query latestBlockHeight {
-    bestChain(maxLength: 1) {
-      protocolState {
-        consensusState {
-          slotSinceGenesis
-        }
-      }
-    }
-  }
-`;
-
 const latestGlobalSlotFromTrace = `query latestBlockHeight { blockTraces }`;
 
-const bestChain = (maxLength: number = 10) => `
-  query BestChain {
-    bestChain(maxLength: ${maxLength}) {
-      stateHash
-      protocolState {
-        consensusState {
-          blockHeight
-        }
-        previousStateHash
-      }
-    }
-  }
-`;
+/** The daemon's status and, except on a vanilla daemon, its metrics. */
+interface NodeSync {
+  daemon: DaemonStatus;
+  metrics: DaemonMetrics | null;
+}
 
-interface BestChainResponse {
-  bestChain: BestChain[];
+/** The chain shape the fork detection works on, from the SDK's blocks. */
+function toBestChain(blocks: { stateHash: string; height: number; previousStateHash?: string }[]): BestChain[] {
+  return blocks.map(b => ({
+    stateHash: b.stateHash,
+    protocolState: {
+      consensusState: { blockHeight: b.height },
+      previousStateHash: b.previousStateHash,
+    },
+  }));
 }
 
 interface BestChain {

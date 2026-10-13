@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { concatAll, forkJoin, from, map, Observable, toArray } from 'rxjs';
 import { CONFIG } from '@shared/constants/config';
 import { HttpClient } from '@angular/common/http';
+import { MinaSdkService } from '@core/services/mina-sdk.service';
 import { DashboardSplits } from '@shared/types/dashboard/splits/dashboard-splits.type';
 import { DashboardSplitsPeer } from '@shared/types/dashboard/splits/dashboard-splits-peer.type';
 import { DashboardSplitsLink } from '@shared/types/dashboard/splits/dashboard-splits-link.type';
@@ -11,42 +12,50 @@ export class DashboardSplitsService {
 
   private readonly options = { headers: { 'Content-Type': 'application/json' } };
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient,
+              private sdk: MinaSdkService) { }
 
   getPeers(): Observable<DashboardSplits> {
     return from(
       CONFIG.configs.map(node =>
-        this.http
-          .post<{ data: GetPeersResponse }>(`${node.graphql}/graphql`, { query: peersQuery }, this.options)
+        this.sdk
+          .callOn(`${node.graphql}/graphql`, async (client): Promise<NodePeers> => {
+            const [status, peers] = await Promise.all([client.getDaemonStatus(), client.getPeers()]);
+            return {
+              externalIp: status.addrsAndPorts?.externalIp,
+              peerId: status.addrsAndPorts?.peer?.peerId,
+              peers: peers.map(p => ({ address: p.host, peerId: p.peerId })),
+            };
+          })
           .pipe(
-            map(response => ({ data: response.data, node: node.name })),
+            map(data => ({ data, node: node.name })),
           ),
       ),
     ).pipe(
       concatAll(),
       toArray(),
-      map((array: { data: GetPeersResponse, node: string }[]) => {
+      map((array: { data: NodePeers, node: string }[]) => {
         const map = new Map<string, string>();
-        array.forEach(({ data, node }: { data: GetPeersResponse, node: string }) => {
+        array.forEach(({ data, node }: { data: NodePeers, node: string }) => {
           node = node.charAt(0).toUpperCase() + node.slice(1);
           node = node.replace(/(\d+)/g, ' $1');
-          map.set(data.daemonStatus.addrsAndPorts.externalIp, node);
+          map.set(data.externalIp, node);
         });
-        return array.reduce((acc: DashboardSplits, { data }: { data: GetPeersResponse }) => {
+        return array.reduce((acc: DashboardSplits, { data }: { data: NodePeers }) => {
           acc.peers.push(
             ...[
-              ...data.getPeers.map((p: GetPeers) => ({ address: p.host, peerId: p.peerId, node: map.get(p.host) })),
+              ...data.peers.map(p => ({ address: p.address, peerId: p.peerId, node: map.get(p.address) })),
               {
-                address: data.daemonStatus.addrsAndPorts.externalIp,
-                peerId: data.daemonStatus.addrsAndPorts.peer.peerId,
-                node: map.get(data.daemonStatus.addrsAndPorts.externalIp),
+                address: data.externalIp,
+                peerId: data.peerId,
+                node: map.get(data.externalIp),
               },
             ],
           );
           acc.links.push(
-            ...data.getPeers.map((p: GetPeers) => ({
-              source: data.daemonStatus.addrsAndPorts.externalIp,
-              target: p.host,
+            ...data.peers.map(p => ({
+              source: data.externalIp,
+              target: p.address,
             })),
           );
           return acc;
@@ -114,42 +123,9 @@ export class DashboardSplitsService {
   }
 }
 
-interface GetPeersResponse {
-  getPeers: GetPeers[];
-  daemonStatus: DaemonStatus;
+/** A node's own address and peer id, and the peers it is connected to. */
+interface NodePeers {
+  externalIp: string | undefined;
+  peerId: string | undefined;
+  peers: { address: string; peerId: string }[];
 }
-
-interface GetPeers {
-  host: string;
-  libp2pPort: number;
-  peerId: string;
-}
-
-interface DaemonStatus {
-  addrsAndPorts: AddrsAndPorts;
-}
-
-interface AddrsAndPorts {
-  externalIp: string;
-  libp2pPort: number;
-  peer: { peerId: string; };
-}
-
-const peersQuery = `
-  query Peers {
-    daemonStatus {
-      addrsAndPorts {
-        peer {
-          peerId
-        }
-        externalIp
-        libp2pPort
-      }
-    }
-    getPeers {
-      host
-      libp2pPort
-      peerId
-    }
-  }
-`;

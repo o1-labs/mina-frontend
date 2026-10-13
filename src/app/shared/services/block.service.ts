@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { GraphQLService } from '@core/services/graph-ql.service';
+import { MinaSdkService } from '@core/services/mina-sdk.service';
 import { map, Observable, of } from 'rxjs';
 import { NodeStatus } from '@shared/types/app/node-status.type';
 import { HttpClient } from '@angular/common/http';
@@ -12,7 +12,7 @@ import { AppNodeStatusTypes } from '@shared/types/app/app-node-status-types.enum
 })
 export class BlockService {
 
-  constructor(private graphQL: GraphQLService,
+  constructor(private sdk: MinaSdkService,
               private http: HttpClient,
               private config: ConfigService) { }
 
@@ -24,22 +24,13 @@ export class BlockService {
         timestamp: Date.now(),
       })
     }
-    return this.graphQL.query<any>('blockStatus', `{
-      daemonStatus {
-        blockchainLength
-        syncStatus
-        consensusTimeNow {
-          startTime
-        }
-      }}`)
+    return this.sdk.call(client => client.getDaemonStatus())
       .pipe(
-        map(response => {
-          return ({
-            blockLevel: Number(response.daemonStatus.blockchainLength ? response.daemonStatus.blockchainLength : 0),
-            status: response.daemonStatus.syncStatus,
-            timestamp: Number(response.daemonStatus ? response.daemonStatus.consensusTimeNow?.startTime : 0),
-          } as NodeStatus);
-        }),
+        map(status => ({
+          blockLevel: status.blockchainLength ?? 0,
+          status: status.syncStatus as AppNodeStatusTypes,
+          timestamp: Number(status.consensusTimeNow?.startTime ?? 0),
+        } as NodeStatus)),
       );
   }
 
