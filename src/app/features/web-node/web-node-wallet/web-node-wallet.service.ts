@@ -4,7 +4,7 @@ import { catchError, first, forkJoin, map, Observable, of, tap } from 'rxjs';
 import { WebNodeService } from '@web-node/web-node.service';
 import { WebNodeTransaction } from '@shared/types/web-node/wallet/web-node-transaction.type';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { GraphQLService } from '@core/services/graph-ql.service';
+import { MinaSdkService } from '@core/services/mina-sdk.service';
 import { ConfigService } from '@core/services/config.service';
 
 
@@ -50,7 +50,7 @@ export class WebNodeWalletService {
 
   constructor(private http: HttpClient,
               private config: ConfigService,
-              private graphQL: GraphQLService,
+              private sdk: MinaSdkService,
               private webNodeService: WebNodeService) { }
 
   getWallets(): Observable<Array<WebNodeWallet | HttpErrorResponse>> {
@@ -253,24 +253,10 @@ export class WebNodeWalletService {
             .map((t: any) => ({ ...t, status: 'included' })),
         ], [])),
       );
-    const mempoolTransactions$: Observable<any[]> = this.graphQL.query<any>('pooledUserCommands',
-      `{ pooledUserCommands { ... on UserCommandPayment {
-            id
-            hash
-            fee
-            amount
-            kind
-            nonce
-            to
-            memo
-            from
-            feeToken
-            failureReason
-            token
-            validUntil } } }`)
+    const mempoolTransactions$: Observable<any[]> = this.sdk.call(client => client.getPooledUserCommands())
       .pipe(
         first(),
-        map((data: any) => data.pooledUserCommands
+        map(commands => commands
           .filter((t: any) => onlyOfThisKey && (t.from === publicKey || t.to === publicKey))
           .map((t: any) => ({ ...t, isInMempool: true, status: 'pending' })),
         ),
@@ -303,10 +289,10 @@ export class WebNodeWalletService {
   getTransactionStatuses(transactionIds: string[]): Observable<{ [id: string]: string }> {
     const mapResponse = {};
     const observables = transactionIds.map((id: string) =>
-      this.graphQL.query<any>('transactionStatus', `{ transactionStatus(payment: "${id}") }`)
+      this.sdk.call(client => client.getTransactionStatus({ payment: id }))
         .pipe(
           first(),
-          tap((response: any) => mapResponse[id] = response.transactionStatus.toLowerCase()),
+          tap((status: string) => mapResponse[id] = status.toLowerCase()),
         ),
     );
 

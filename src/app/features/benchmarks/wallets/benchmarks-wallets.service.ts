@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { GraphQLService } from '@core/services/graph-ql.service';
+import { MinaSdkService } from '@core/services/mina-sdk.service';
+import { Currency } from '@o1-labs/mina-sdk';
 import { catchError, map, Observable, of } from 'rxjs';
 import { BenchmarksWallet } from '@shared/types/benchmarks/wallets/benchmarks-wallet.type';
 import { ConfigService } from '@core/services/config.service';
@@ -626,7 +627,7 @@ export class BenchmarksWalletsService {
   // client: any = null;
 
   constructor(private config: ConfigService,
-              private graphQL: GraphQLService) {
+              private sdk: MinaSdkService) {
     // this.createWalletAndAddFunds();
     if (!localStorage.getItem('browserId')) {
       localStorage.setItem('browserId', Math.floor(Math.random() * 999999999).toString());
@@ -634,16 +635,12 @@ export class BenchmarksWalletsService {
   }
 
   getAccounts(): Observable<BenchmarksWallet[]> {
-    let query = '{';
-    this.wallets.forEach((wallet, i: number) => query += `account${i}: account(publicKey: "${wallet.publicKey}") { nonce balance { liquid } }, `);
-    query += '}';
-
-    return this.graphQL.query<any>('getAccounts', query)
+    return this.sdk.call(client => Promise.all(this.wallets.map(wallet => client.getAccount(wallet.publicKey))))
       .pipe(
-        map((gqlResponse: any) => Object.keys(gqlResponse).map((key: any, i: number) => ({
+        map(accounts => accounts.map((account, i: number) => ({
           ...this.wallets[i],
-          minaTokens: Number(gqlResponse[`account${i}`].balance.liquid) / ONE_MILLION,
-          nonce: Number(gqlResponse[`account${i}`].nonce),
+          minaTokens: Number(account.balance.liquid?.toNanominaString() ?? '0') / ONE_MILLION,
+          nonce: account.nonce,
           successTx: 0,
           failedTx: 0,
         }))),
@@ -657,17 +654,29 @@ export class BenchmarksWalletsService {
       field: signedPayment.signature.field,
       scalar: signedPayment.signature.scalar,
     };
-
-    const txBody: string = sendTxGraphQLMutationBody();
-    return this.graphQL.mutation('sendTx', txBody, signedTx).pipe(
-      map((result: any) => {
-        const response = result.sendPayment.payment;
+    return this.sdk.call(client => client.sendPayment({
+      sender: transaction.from,
+      receiver: transaction.to,
+      amount: Currency.fromNanomina(BigInt(transaction.amount)),
+      fee: Currency.fromNanomina(BigInt(transaction.fee)),
+      memo: transaction.memo || undefined,
+      nonce: transaction.nonce ? Number(transaction.nonce) : undefined,
+      validUntil: transaction.validUntil ? Number(transaction.validUntil) : undefined,
+      signature: { field: signedPayment.signature.field, scalar: signedPayment.signature.scalar },
+    })).pipe(
+      map(response => {
+        const memo = response.memo ?? transaction.memo;
         return {
-          ...response,
-          from: response.from,
-          memo: response.memoVerbatim ?? response.memo,
-          dateTime: response.memoVerbatim?.includes(',') ? toReadableDate(response.memoVerbatim.split(',')[0]) : undefined,
-        };
+          ...transaction,
+          id: response.id,
+          hash: response.hash,
+          kind: response.kind,
+          from: response.source ?? transaction.from,
+          to: response.receiver ?? transaction.to,
+          nonce: String(response.nonce),
+          memo,
+          dateTime: memo?.includes(',') ? toReadableDate(memo.split(',')[0]) : undefined,
+        } as BenchmarksWalletTransaction;
       }),
       catchError((err) => {
         const error = new Error(err.message);
@@ -681,18 +690,14 @@ export class BenchmarksWalletsService {
   }
 
   getMempoolTransactions(): Observable<BenchmarksMempoolTx[]> {
-    return this.graphQL.query<any>('pooledUserCommands',
-      `{ pooledUserCommands { ... on UserCommandPayment {
-            nonce
-            memoVerbatim
-            from } } }`)
+    return this.sdk.call(client => client.getPooledUserCommands())
       .pipe(
-        map((data: any) => data.pooledUserCommands
-          .map((tx: any) => ({
+        map(commands => commands
+          .map(tx => ({
             from: tx.from,
-            nonce: tx.nonce,
-            memo: tx.memoVerbatim,
-            dateTime: tx.memoVerbatim?.includes(',') ? toReadableDate(tx.memoVerbatim.split(',')[0]) : undefined,
+            nonce: Number(tx.nonce),
+            memo: tx.memo,
+            dateTime: tx.memo?.includes(',') ? toReadableDate(tx.memo.split(',')[0]) : undefined,
           } as BenchmarksMempoolTx)),
         ),
       );
@@ -855,41 +860,4 @@ export class BenchmarksWalletsService {
   //     console.log(txs);
   //   });
   // }
-}
-
-function sendTxGraphQLMutationBody(): string {
-  return `
-    ($fee:UInt64!, $amount:UInt64!,
-    $to: PublicKey!, $from: PublicKey!, $nonce:UInt32, $memo: String,
-    $validUntil: UInt32,$scalar: String!, $field: String!
-    ) {
-      sendPayment(
-        input: {
-          fee: $fee,
-          amount: $amount,
-          to: $to,
-          from: $from,
-          memo: $memo,
-          nonce: $nonce,
-          validUntil: $validUntil
-        }, 
-        signature: {
-          field: $field, scalar: $scalar
-        }) {
-        payment {
-          amount
-          fee
-          feeToken
-          from
-          hash
-          id
-          isDelegation
-          memo
-          memoVerbatim
-          nonce
-          kind
-          to
-        }
-      }
-    }`;
 }

@@ -28,7 +28,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { addError, createNonDispatchableEffect } from '@shared/constants/store-functions';
 import { MinaErrorType } from '@shared/types/error-preview/mina-error-type.enum';
 import { NodeStatus } from '@shared/types/app/node-status.type';
-import { GraphQLService } from '@core/services/graph-ql.service';
+import { MinaSdkService } from '@core/services/mina-sdk.service';
 import { Router } from '@angular/router';
 import { FeatureType, MinaNode } from '@shared/types/core/environment/mina-env.type';
 import { withLatestFrom } from 'rxjs/operators';
@@ -60,7 +60,7 @@ export class AppEffects extends MinaBaseEffect<AppActions> {
 
   constructor(private actions$: Actions,
               private appService: AppService,
-              private graphQL: GraphQLService,
+              private sdk: MinaSdkService,
               private tracingGQL: TracingGraphQlService,
               private blockService: BlockService,
               private router: Router,
@@ -174,7 +174,7 @@ export class AppEffects extends MinaBaseEffect<AppActions> {
   }
 
   private changeGqlProvider(node: MinaNode): void {
-    this.graphQL.changeGraphQlProvider(node);
+    this.sdk.changeNode(node);
     this.tracingGQL.changeGraphQlProvider(node);
   }
 }
